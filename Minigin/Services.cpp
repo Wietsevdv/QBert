@@ -124,7 +124,7 @@ void dae::SDL_SoundSystem::SDL_SoundSystemImpl::PlayQueue()
 			//get a copy of sounds to play
 			//remove the current ones from SHARED QUEUE
 			//this can probably use an algorithm
-			for (int i{}; i < m_PlayQueue.size(); ++i)
+			for (size_t i{}; i < m_PlayQueue.size(); ++i)
 			{
 				soundId id = m_PlayQueue.front();
 				m_PlayQueue.pop();
@@ -133,7 +133,7 @@ void dae::SDL_SoundSystem::SDL_SoundSystemImpl::PlayQueue()
 			}
 			lock.unlock();
 
-			for (int i{}; i < soundsToPlay.size(); ++i)
+			for (size_t i{}; i < soundsToPlay.size(); ++i)
 			{
 				soundId id = soundsToPlay.front();
 				soundsToPlay.pop();
