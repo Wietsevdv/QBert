@@ -262,3 +262,11 @@ void dae::PlayerComponent::IncreaseScore(int amount)
 	GameObject* pOwner = GetOwner();
 	pOwner->GetSubject()->NotifyObservers(*pOwner, GameEvents::PlayerScoreIncreased);
 }
+
+void dae::UIComponent::Notify(const GameObject& gameObject, GameEvents event)
+{
+	gameObject;
+	event;
+
+	std::cout << "\nUI component notified\n";
+}

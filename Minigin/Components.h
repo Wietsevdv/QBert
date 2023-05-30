@@ -8,6 +8,7 @@
 
 #include "ResourceManager.h"
 #include "XInputController.h"
+#include "Subject.h"
 
 namespace dae
 {
@@ -289,5 +290,25 @@ namespace dae
 	private:
 		int m_NrOfLives;
 		int m_Score;
+	};
+
+	class UIComponent final : public BaseComponent, public Observer
+	{
+	public:
+		UIComponent(GameObject* pGameObject)
+			: BaseComponent(pGameObject)
+		{
+		};
+
+		virtual ~UIComponent() {};
+		UIComponent(const UIComponent& other) = delete;
+		UIComponent(UIComponent&& other) = delete;
+		UIComponent& operator=(const UIComponent& other) = delete;
+		UIComponent& operator=(UIComponent&& other) = delete;
+
+		virtual void Update(const float) override {};
+		virtual void LateUpdate() override {};
+
+		virtual void Notify(const GameObject& gameObject, GameEvents event) override;
 	};
 }

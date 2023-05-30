@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include "InputManager.h"
 #include "XInputController.h"
+#include "Services.h"
 
 #include <iostream>
 
@@ -9,6 +10,12 @@
 
 bool dae::InputManager::ProcessInput()
 {
+	//controller input is handled by the controllers themselves. Binding commands to their buttons is also done through the controller.
+	//the inputManager is responsible for keyboard input and should also be provide functionality to bind keys to commands
+	//the controllerComps have and index variable, the order they were added to m_pControllerComponents is the same as their indexes
+
+	SoundSystem* pSS = ServiceLocator::GetSoundSystem();
+
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT) 
@@ -40,6 +47,10 @@ bool dae::InputManager::ProcessInput()
 				glm::vec3 vector{ 1, 0, 0 };
 				GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
 				m_ButtonCommandmap.find(ControllerButtons::DRight)->second.get()->Execute(pOwner, &vector);
+			}
+			if (e.key.keysym.sym == SDLK_v)
+			{
+				pSS->Play(0);
 			}
 		}
 		if (e.type == SDL_KEYUP)

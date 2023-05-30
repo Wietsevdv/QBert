@@ -3,12 +3,10 @@
 #include <list>
 #include "Components.h"
 #include "Subject.h"
-#include "iostream"
+#include <iostream>
 
 namespace dae
 {
-	class Subject;
-
 	class GameObject final
 	{
 	public:
@@ -34,8 +32,9 @@ namespace dae
 		int GetNrOfChildren() const { return static_cast<int>(m_pChildren.size()); }
 
 		Subject* MakeSubject();
+		//check for nullptr
 		Subject* GetSubject() const { return m_pSubject.get(); }
-
+		
 		void SetDead() { m_IsDead = true; }
 		bool GetIsDead() const { return m_IsDead; }
 

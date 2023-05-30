@@ -16,7 +16,7 @@ namespace dae
 		Subject& operator=(const Subject& other) = delete;
 		Subject& operator=(Subject&& other) = delete;
 
-		void AddObserver(Observer* pObserver) { m_Observers.emplace_back(pObserver); } //add checks
+		void AddObserver(Observer* pObserver) { m_Observers.push_back(pObserver); } //add checks
 		void RemoveObserver(Observer*) {}; //make
 
 		void NotifyObservers(const GameObject& gameObject, GameEvents gameEvent);
