@@ -11,11 +11,11 @@ namespace dae
 	{
 	public:
 		void Update(const float deltaT);
-		void LateUpdate();
+		void LateUpdate(const float deltaT);
 		void Render() const;
 
 		const glm::vec3 GetLocalPosition() const { return m_pTransformComponent->GetLocalPosition(); }
-		const glm::vec3 GetWorldPosition() const;
+		const glm::vec3 GetWorldPosition() const {	return m_pTransformComponent->GetWorldPosition(); }
 
 		template <class component> component* AddComponent(GameObject* pGo);
 		template <class component> void RemoveComponent();
@@ -58,8 +58,8 @@ namespace dae
 
 		bool m_IsDead = false;
 
-		void SetLocalPosition(const glm::vec3 localPos);
-		void SetLocalPosition(float x, float y, float z);
+		//void SetLocalPosition(const glm::vec3 localPos);
+		//void SetLocalPosition(float x, float y, float z);
 
 		void SetPositionDirty() { m_pTransformComponent->SetPositionDirty(); }
 	};

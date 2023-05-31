@@ -19,7 +19,7 @@ namespace dae
 		void RemoveAllObservers();
 
 		void Update(const float deltaT);
-		void LateUpdate();
+		void LateUpdate(const float deltaT);
 		void Render() const;
 
 		~Scene();

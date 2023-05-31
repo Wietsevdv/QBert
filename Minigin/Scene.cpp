@@ -48,11 +48,11 @@ void Scene::Update(const float deltaT)
 	}
 }
 
-void dae::Scene::LateUpdate()
+void dae::Scene::LateUpdate(const float deltaT)
 {
 	for (auto& object : m_objects)
 	{
-		object->LateUpdate();
+		object->LateUpdate(deltaT);
 	}
 
 	//delete dead gameObjects

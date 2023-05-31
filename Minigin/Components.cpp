@@ -10,7 +10,10 @@
 
 void dae::RenderComponent::Render(float x, float y)
 {
-	Renderer::GetInstance().RenderTexture(*m_pTexture.get(), x, y);
+	glm::ivec2 textureSize = m_pTexture->GetSize();
+	float renderPosX = x - textureSize.x / 2.f;
+	float renderPosY = y - textureSize.y;
+	Renderer::GetInstance().RenderTexture(*m_pTexture.get(), renderPosX, renderPosY);
 }
 
 dae::TextureComponent::TextureComponent(GameObject* pGameObject)
@@ -132,12 +135,7 @@ void dae::FPSComponent::Update(const float deltaT)
 
 void dae::TransformComponent::SetLocalPosition(const glm::vec3& localPos)
 {
-	m_LocalPosition = localPos;
-	m_PositionIsDirty = true;
-
-	GameObject* pParent = GetOwner()->GetParent();
-	if (pParent)
-		pParent->SetChildrenPosDirty();
+	SetLocalPosition(localPos.x, localPos.y, localPos.z);
 }
 
 void dae::TransformComponent::SetLocalPosition(float x, float y, float z)
@@ -153,19 +151,6 @@ void dae::TransformComponent::SetLocalPosition(float x, float y, float z)
 		GetOwner()->SetChildrenPosDirty();
 }
 
-void dae::TransformComponent::UpdateWorldPosition()
-{
-	if (m_PositionIsDirty)
-	{
-		auto pOwnerParent = GetOwner()->GetParent();
-		if (pOwnerParent == nullptr)
-			m_WorldPosition = m_LocalPosition;
-		else
-			m_WorldPosition = pOwnerParent->GetWorldPosition() + m_LocalPosition;
-	}
-	m_PositionIsDirty = false;
-}
-
 const glm::vec3& dae::TransformComponent::GetWorldPosition()
 {
 	if (m_PositionIsDirty)
@@ -173,24 +158,15 @@ const glm::vec3& dae::TransformComponent::GetWorldPosition()
 	return m_WorldPosition;
 }
 
-dae::CirclingComponent::CirclingComponent(GameObject* pGameObject)
-	: BaseComponent(pGameObject)
-	, m_Angle(0)
+void dae::TransformComponent::UpdateWorldPosition()
 {
-	if (!pGameObject->IsComponentAdded<TransformComponent>())
-		m_pTransformComponent = pGameObject->AddComponent<TransformComponent>(pGameObject);
+	auto pOwnerParent = GetOwner()->GetParent();
+	if (pOwnerParent == nullptr)
+		m_WorldPosition = m_LocalPosition;
 	else
-		m_pTransformComponent = pGameObject->GetComponent<TransformComponent>();
-}
+		m_WorldPosition = pOwnerParent->GetWorldPosition() + m_LocalPosition;
 
-void dae::CirclingComponent::Update(const float deltaT)
-{
-	m_Angle += m_RotationSpeed * deltaT;
-
-	float x = m_Radius * cos(m_Angle);
-	float y = m_Radius * sin(m_Angle);
-
-	m_pTransformComponent->SetLocalPosition(x, y, 0.f);
+	m_PositionIsDirty = false;
 }
 
 dae::ControllerComponent::ControllerComponent(GameObject* pGameObject)
@@ -202,65 +178,6 @@ dae::ControllerComponent::ControllerComponent(GameObject* pGameObject)
 void dae::ControllerComponent::Update(const float)
 {
 	m_pController->Update();
-}
-
-dae::MovementComponent::MovementComponent(GameObject* pGameObject)
-	: BaseComponent(pGameObject)
-	, m_Speed{ 50.f }
-	, m_Direction{ glm::vec3{0.f, 0.f, 0.f} }
-{
-	if (!pGameObject->IsComponentAdded<TransformComponent>())
-		m_pTransformComponent = pGameObject->AddComponent<TransformComponent>(pGameObject);
-	else
-		m_pTransformComponent = pGameObject->GetComponent<TransformComponent>();
-}
-
-void dae::MovementComponent::Update(const float deltaT)
-{
-	glm::vec3 direction = m_Direction;
-	const float length = glm::sqrt(direction.x * direction.x + direction.y * direction.y);
-	if (length > 0)
-	{
-		direction.x /= length;
-		direction.y /= length;
-	}
-
-	if (m_pTransformComponent)
-	{
-		const glm::vec3& newPos = m_pTransformComponent->GetLocalPosition() + direction * m_Speed * deltaT;
-		m_pTransformComponent->SetLocalPosition(newPos);
-	}
-	else
-		std::cout << "TransformComponent is nullptr\n";
-}
-
-void dae::MovementComponent::AddDirection(const glm::vec3& direction)
-{
-	m_Direction += direction;
-}
-
-void dae::MovementComponent::SetDirection(const glm::vec3& direction)
-{
-	m_Direction = direction;
-}
-
-void dae::PlayerComponent::LoseLifePoint()
-{
-	if (m_NrOfLives > 0)
-	{
-		--m_NrOfLives;
-
-		GameObject* pOwner = GetOwner();
-		pOwner->GetSubject()->NotifyObservers(*pOwner, GameEvents::PlayerDied);
-	}
-}
-
-void dae::PlayerComponent::IncreaseScore(int amount)
-{
-	m_Score += amount;
-
-	GameObject* pOwner = GetOwner();
-	pOwner->GetSubject()->NotifyObservers(*pOwner, GameEvents::PlayerScoreIncreased);
 }
 
 void dae::UIComponent::Notify(const GameObject& gameObject, GameEvents event)

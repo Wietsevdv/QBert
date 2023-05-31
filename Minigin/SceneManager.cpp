@@ -9,11 +9,11 @@ void dae::SceneManager::Update(const float deltaT)
 	}
 }
 
-void dae::SceneManager::LateUpdate()
+void dae::SceneManager::LateUpdate(const float deltaT)
 {
 	for (auto& scene : m_scenes)
 	{
-		scene->LateUpdate();
+		scene->LateUpdate(deltaT);
 	}
 }
 

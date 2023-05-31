@@ -23,11 +23,11 @@ void dae::GameObject::Update(const float deltaT)
 	}
 }
 
-void dae::GameObject::LateUpdate()
+void dae::GameObject::LateUpdate(const float deltaT)
 {
 	for (auto pComponent : m_pComponents)
 	{
-		pComponent->LateUpdate();
+		pComponent->LateUpdate(deltaT);
 	}
 
 	//Remove and delete dead components
@@ -49,32 +49,14 @@ void dae::GameObject::Render() const
 	}
 }
 
-const glm::vec3 dae::GameObject::GetWorldPosition() const
-{
-	if (m_pParent)
-		return m_pTransformComponent->GetWorldPosition();
-
-	return m_pTransformComponent->GetLocalPosition();
-}
-
-void dae::GameObject::SetLocalPosition(const glm::vec3 localPos)
-{
-	SetLocalPosition(localPos.x, localPos.y, localPos.z);
-}
-
-void dae::GameObject::SetLocalPosition(float x, float y, float z)
-{
-	m_pTransformComponent->SetLocalPosition(x, y, z);
-}
-
 void dae::GameObject::SetParent(GameObject* pParent)
 {
 	if (pParent == nullptr)
-		SetLocalPosition(GetWorldPosition());
+		m_pTransformComponent->SetLocalPosition(GetWorldPosition());
 	else
 	{
-		SetLocalPosition(GetLocalPosition() - pParent->GetWorldPosition());
-		SetPositionDirty();
+		m_pTransformComponent->SetLocalPosition(GetLocalPosition() - pParent->GetWorldPosition());
+		//SetPositionDirty();
 	}
 
 	if (m_pParent)

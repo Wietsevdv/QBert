@@ -29,7 +29,9 @@ namespace dae
 		bool GetIsDead() const { return m_IsDead; }
 
 		virtual void Update(const float deltaT) = 0;
-		virtual void LateUpdate() = 0;
+		virtual void LateUpdate(const float deltaT) = 0;
+
+		GameObject* GetOwner() const { return m_pGameObject; }
 
 	private:
 		GameObject* m_pGameObject;
@@ -37,7 +39,6 @@ namespace dae
 
 	protected:
 		explicit BaseComponent(GameObject* pGameObject) : m_pGameObject(pGameObject) {}
-		GameObject* GetOwner() const { return m_pGameObject; }
 	};
 
 	class TransformComponent final : public BaseComponent
@@ -57,9 +58,7 @@ namespace dae
 		TransformComponent& operator=(TransformComponent&& other) = delete;
 
 		virtual void Update(const float) override {};
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
+		virtual void LateUpdate(const float) override {};
 
 		void SetLocalPosition(const glm::vec3& localPos);
 		void SetLocalPosition(float x, float y, float z);
@@ -90,9 +89,7 @@ namespace dae
 		RenderComponent& operator=(RenderComponent&& other) = delete;
 
 		virtual void Update(const float) override {};
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
+		virtual void LateUpdate(const float) override {};
 
 		void SetTexture(std::shared_ptr<Texture2D> pTexture) { m_pTexture = pTexture; }
 		void Render(float x, float y);
@@ -113,9 +110,7 @@ namespace dae
 		TextureComponent& operator=(TextureComponent&& other) = delete;
 
 		virtual void Update(const float) override {};
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
+		virtual void LateUpdate(const float) override {};
 
 		void SetTexture(const std::string& fileName);
 
@@ -138,9 +133,7 @@ namespace dae
 		TextComponent& operator=(TextComponent&& other) = delete;
 
 		virtual void Update(const float deltaT) override;
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
+		virtual void LateUpdate(const float) override {};
 
 		void SetText(const std::string& text);
 		void SetColor(Uint8 r, Uint8 g, Uint8 b);
@@ -169,9 +162,7 @@ namespace dae
 		FPSComponent& operator=(FPSComponent&& other) = delete;
 
 		virtual void Update(const float) override;
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
+		virtual void LateUpdate(const float) override {};
 
 	private:
 		int m_NrOfFrames;
@@ -180,34 +171,6 @@ namespace dae
 
 		//QUICK ACCESS (no ownership)
 		TextComponent* m_pTextComponent;
-	};
-
-	class CirclingComponent final : public BaseComponent
-	{
-	public:
-		CirclingComponent(GameObject* pGameObject);
-
-		virtual ~CirclingComponent() {};
-		CirclingComponent(const CirclingComponent& other) = delete;
-		CirclingComponent(CirclingComponent&& other) = delete;
-		CirclingComponent& operator=(const CirclingComponent& other) = delete;
-		CirclingComponent& operator=(CirclingComponent&& other) = delete;
-
-		virtual void Update(const float dt) override;
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
-
-		void SetRadius(float radius) { m_Radius = radius; }
-		void SetRotationSpeed(float rotationSpeed) { m_RotationSpeed = rotationSpeed; }
-
-	private:
-		float m_Angle{ 0 };
-		float m_RotationSpeed{ 10.f };
-		float m_Radius{ 10.f };
-
-		//QUICK ACCESS (no ownership)
-		TransformComponent* m_pTransformComponent;
 	};
 
 	class ControllerComponent final : public BaseComponent
@@ -222,74 +185,12 @@ namespace dae
 		ControllerComponent& operator=(ControllerComponent&& other) = delete;
 
 		virtual void Update(const float dt) override;
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
+		virtual void LateUpdate(const float) override {};
 
 		XInputController* GetController() const { return m_pController.get(); }
 
 	private:
 		std::unique_ptr<XInputController> m_pController{};
-	};
-
-	class MovementComponent final : public BaseComponent
-	{
-	public:
-		MovementComponent(GameObject* pGameObject);
-
-		virtual ~MovementComponent() {};
-		MovementComponent(const MovementComponent& other) = delete;
-		MovementComponent(MovementComponent&& other) = delete;
-		MovementComponent& operator=(const MovementComponent& other) = delete;
-		MovementComponent& operator=(MovementComponent&& other) = delete;
-
-		virtual void Update(const float dt) override;
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
-
-		void SetSpeed(float speed) { m_Speed = speed; }
-		float GetSpeed() const { return m_Speed; }
-		void AddDirection(const glm::vec3& direction);
-		void SetDirection(const glm::vec3& direction);
-
-	private:
-		float m_Speed;
-		glm::vec3 m_Direction;
-
-		//QUICK ACCESS (no ownership)
-		TransformComponent* m_pTransformComponent;
-	};
-
-	class PlayerComponent final : public BaseComponent
-	{
-	public:
-		PlayerComponent(GameObject* pGameObject)
-			: BaseComponent(pGameObject)
-			, m_NrOfLives{ 3 }
-			, m_Score{ 0 }
-		{};
-
-		virtual ~PlayerComponent() {};
-		PlayerComponent(const PlayerComponent& other) = delete;
-		PlayerComponent(PlayerComponent&& other) = delete;
-		PlayerComponent& operator=(const PlayerComponent& other) = delete;
-		PlayerComponent& operator=(PlayerComponent&& other) = delete;
-
-		virtual void Update(const float) override {};
-		virtual void LateUpdate() override {};
-
-		GameObject* GetOwner() const { return BaseComponent::GetOwner(); }
-
-		int GetNrOfLives() const { return m_NrOfLives; }
-		int GetScore() const { return m_Score; }
-
-		void LoseLifePoint();
-		void IncreaseScore(int amount);
-
-	private:
-		int m_NrOfLives;
-		int m_Score;
 	};
 
 	class UIComponent final : public BaseComponent, public Observer
@@ -307,8 +208,13 @@ namespace dae
 		UIComponent& operator=(UIComponent&& other) = delete;
 
 		virtual void Update(const float) override {};
-		virtual void LateUpdate() override {};
+		virtual void LateUpdate(const float) override {};
 
 		virtual void Notify(const GameObject& gameObject, GameEvents event) override;
+
+	private:
+		//keep pointers or reference to a texture and a text component. Give interface for setting a texture or a text which is then set on the rendercomponent.
+		//writing functionality in Notify would make the UIComponent unusable.
+		//instead make it a pure virtual base class. A project would inherit from this and add it's own functionality in its notify.
 	};
 }
