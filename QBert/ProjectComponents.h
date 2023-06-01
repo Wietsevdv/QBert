@@ -34,7 +34,7 @@ namespace dae
 
 		//Don't multiply your direction with deltaT. This is done when adding the complete velocity to the gameObject in LateUpdate()
 		void Add(const glm::vec3& direction) { m_Velocity += direction; }
-		void Stop() { m_Velocity = glm::vec3{ 0.f, 0.f, 0.f }; }
+		void Land();
 
 	private:
 		glm::vec3 m_Velocity;
@@ -88,10 +88,55 @@ namespace dae
 
 		void SetDirection(const glm::vec3& direction) { m_Direction = direction; }
 
+		void SetGravityOn(bool gravityOn = true) { m_On = gravityOn; }
+
 	private:
 		glm::vec3 m_Direction;
 
+		bool m_On;
+
 		//QUICK ACCESS (no ownership)
 		MovementComponent* m_pMovementComponent;
+	};
+
+	class PlayerCollisionComponent final : public CollisionComponent
+	{
+	public:
+		PlayerCollisionComponent(GameObject* pGameObject);
+
+		virtual ~PlayerCollisionComponent() {};
+		PlayerCollisionComponent(const PlayerCollisionComponent& other) = delete;
+		PlayerCollisionComponent(PlayerCollisionComponent&& other) = delete;
+		PlayerCollisionComponent& operator=(const PlayerCollisionComponent& other) = delete;
+		PlayerCollisionComponent& operator=(PlayerCollisionComponent&& other) = delete;
+
+		virtual void Update(const float deltaT) override { CollisionComponent::Update(deltaT); } //DOES THIS WORK WITHOUT OVERWRITING???
+		virtual void LateUpdate(const float) override {};
+
+		void HandleOverlap(GameObject* pOtherObject);
+
+	private:
+		MovementComponent* m_pMovementComponent;
+		GravityComponent* m_pGravityComponent;
+	};
+
+	class CubeComponent final : public BaseComponent
+	{
+	public:
+		CubeComponent(GameObject* pGameObject)
+			: BaseComponent{ pGameObject }
+		{
+		};
+
+		virtual ~CubeComponent() {};
+		CubeComponent(const CubeComponent& other) = delete;
+		CubeComponent(CubeComponent&& other) = delete;
+		CubeComponent& operator=(const CubeComponent& other) = delete;
+		CubeComponent& operator=(CubeComponent&& other) = delete;
+
+		virtual void Update(const float) override {};
+		virtual void LateUpdate(const float) override {};
+
+	private:
 	};
 }

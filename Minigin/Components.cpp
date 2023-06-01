@@ -8,6 +8,53 @@
 
 #include "iostream"
 
+void dae::TransformComponent::SetLocalPosition(const glm::vec3& localPos)
+{
+	SetLocalPosition(localPos.x, localPos.y, localPos.z);
+}
+
+void dae::TransformComponent::SetLocalPosition(float x, float y, float z)
+{
+	CollisionComponent* pCollisionComp = dynamic_cast<CollisionComponent*>(m_pCollisionComponent);
+	if (pCollisionComp)
+	{
+		const glm::vec3 oldPos = m_LocalPosition;
+		m_LocalPosition = { x, y, z };
+
+		const glm::vec3 displacement = m_LocalPosition - oldPos;
+		const glm::vec2 displacement2D = { displacement.x, displacement.y };
+		pCollisionComp->AddDisplacement(displacement2D);
+	}
+	else
+	{
+		m_LocalPosition = { x, y, z };
+	}
+
+	m_PositionIsDirty = true;
+
+	int nrOfChildren = GetOwner()->GetNrOfChildren();
+	if (nrOfChildren > 0)
+		GetOwner()->SetChildrenPosDirty();
+}
+
+const glm::vec3& dae::TransformComponent::GetWorldPosition()
+{
+	if (m_PositionIsDirty)
+		UpdateWorldPosition();
+	return m_WorldPosition;
+}
+
+void dae::TransformComponent::UpdateWorldPosition()
+{
+	auto pOwnerParent = GetOwner()->GetParent();
+	if (pOwnerParent == nullptr)
+		m_WorldPosition = m_LocalPosition;
+	else
+		m_WorldPosition = pOwnerParent->GetWorldPosition() + m_LocalPosition;
+
+	m_PositionIsDirty = false;
+}
+
 void dae::RenderComponent::Render(float x, float y)
 {
 	glm::ivec2 textureSize = m_pTexture->GetSize();
@@ -133,42 +180,6 @@ void dae::FPSComponent::Update(const float deltaT)
 	}
 }
 
-void dae::TransformComponent::SetLocalPosition(const glm::vec3& localPos)
-{
-	SetLocalPosition(localPos.x, localPos.y, localPos.z);
-}
-
-void dae::TransformComponent::SetLocalPosition(float x, float y, float z)
-{
-	m_LocalPosition.x = x;
-	m_LocalPosition.y = y;
-	m_LocalPosition.z = z;
-
-	m_PositionIsDirty = true;
-
-	int nrOfChildren = GetOwner()->GetNrOfChildren();
-	if (nrOfChildren > 0)
-		GetOwner()->SetChildrenPosDirty();
-}
-
-const glm::vec3& dae::TransformComponent::GetWorldPosition()
-{
-	if (m_PositionIsDirty)
-		UpdateWorldPosition();
-	return m_WorldPosition;
-}
-
-void dae::TransformComponent::UpdateWorldPosition()
-{
-	auto pOwnerParent = GetOwner()->GetParent();
-	if (pOwnerParent == nullptr)
-		m_WorldPosition = m_LocalPosition;
-	else
-		m_WorldPosition = pOwnerParent->GetWorldPosition() + m_LocalPosition;
-
-	m_PositionIsDirty = false;
-}
-
 dae::ControllerComponent::ControllerComponent(GameObject* pGameObject)
 	: BaseComponent(pGameObject)
 	, m_pController{ std::make_unique<XInputController>(this) }
@@ -186,4 +197,92 @@ void dae::UIComponent::Notify(const GameObject& gameObject, GameEvents event)
 	event;
 
 	std::cout << "\nUI component notified\n";
+}
+
+std::vector<dae::CollisionComponent*> dae::CollisionComponent::m_pAllCollisionComponents;
+
+dae::CollisionComponent::CollisionComponent(GameObject* pGameObject)
+	: BaseComponent{ pGameObject }
+	, m_pCallbackFunction{ nullptr }
+{
+	m_pAllCollisionComponents.emplace_back(this);
+
+	if (!pGameObject->IsComponentAdded<TransformComponent>())
+		m_pTransformComponent = pGameObject->AddComponent<TransformComponent>(pGameObject);
+	else
+		m_pTransformComponent = pGameObject->GetComponent<TransformComponent>();
+
+	m_pTransformComponent->SetCollisionComponent(this);
+
+	const glm::vec3& worldPos = m_pTransformComponent->GetWorldPosition();
+	const glm::vec2 worldPos2D = { worldPos.x, worldPos.y };
+
+	m_Points[0] = worldPos2D + glm::vec2{ -10.f, 0.f };
+	m_Points[1] = worldPos2D + glm::vec2{ 10.f, 0.f };
+	m_Points[2] = worldPos2D + glm::vec2{ -10.f, -10.f };
+	m_Points[3] = worldPos2D + glm::vec2{ 10.f, -10.f };
+}
+
+void dae::CollisionComponent::Update(const float)
+{
+	//write here the logic for where you check if you're overlapping other collision components by calling IsOverlapping(...) on every other collision component
+	if (m_pCallbackFunction)
+	{
+		GameObject* pOwner = GetOwner();
+		glm::vec2& bottomLeft = m_Points[0];
+		glm::vec2& bottomRight = m_Points[1];
+		glm::vec2& topLeft = m_Points[2];
+		glm::vec2& topRight = m_Points[3];
+
+		for (auto pCollisionComp : m_pAllCollisionComponents)
+		{
+			if (pOwner == pCollisionComp->GetOwner()) //skip yourself
+				continue;
+
+			if (pCollisionComp->IsOverlapping(bottomLeft, bottomRight, topLeft, topRight))
+				m_pCallbackFunction(pCollisionComp->GetOwner());
+		}
+	}
+}
+
+void dae::CollisionComponent::SetPoints(glm::vec2& leftBottom, glm::vec2& rightBottom, glm::vec2& leftTop, glm::vec2& rightTop, bool areWorldPositions)
+{
+	if (areWorldPositions)
+	{
+		m_Points[0] = leftBottom;
+		m_Points[1] = rightBottom;
+		m_Points[2] = leftTop;
+		m_Points[3] = rightTop;
+	}
+	else
+	{
+		const glm::vec3& worldPos = m_pTransformComponent->GetWorldPosition();
+		const glm::vec2 worldPos2D = { worldPos.x, worldPos.y };
+
+		m_Points[0] = worldPos2D + leftBottom;
+		m_Points[1] = worldPos2D + rightBottom;
+		m_Points[2] = worldPos2D + leftTop;
+		m_Points[3] = worldPos2D + rightTop;
+	}
+}
+
+void dae::CollisionComponent::AddDisplacement(const glm::vec2& displacement)
+{
+	for (int i{}; i < 4; ++i)
+	{
+		m_Points[i] += displacement;
+	}
+}
+
+bool dae::CollisionComponent::IsOverlapping(const glm::vec2& leftBottom, const glm::vec2& rightBottom, const glm::vec2&, const glm::vec2& rightTop) const
+{
+	if (rightBottom.x < m_Points[0].x || leftBottom.x > m_Points[1].x) // projections of boxes on x-axis do not overlap
+		return false;
+
+	//opposite comparison because y-axis points downwards
+	if (rightTop.y > m_Points[0].y || rightBottom.y < m_Points[3].y) // projections of boxes on y-axis do not overlap
+		return false;
+
+	//projections on both axis overlap. This means the boxes overlap in the level.
+	return true;
 }

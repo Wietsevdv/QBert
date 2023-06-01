@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <string>
+#include <functional>
+#include <vector>
 
 #include <SDL_ttf.h>
 #include <glm/glm.hpp>
@@ -49,6 +51,7 @@ namespace dae
 			, m_LocalPosition()
 			, m_WorldPosition()
 			, m_PositionIsDirty(false)
+			, m_pCollisionComponent(nullptr)
 		{};
 
 		virtual ~TransformComponent() {};
@@ -68,6 +71,9 @@ namespace dae
 
 		void SetPositionDirty() { m_PositionIsDirty = true; }
 
+		//BaseComp because Collisioncomp is not yet defined
+		void SetCollisionComponent(BaseComponent* pCollisionComp) { m_pCollisionComponent = pCollisionComp; }
+
 	private:
 		glm::vec3 m_LocalPosition;
 		glm::vec3 m_WorldPosition;
@@ -75,6 +81,9 @@ namespace dae
 		bool m_PositionIsDirty;
 
 		void UpdateWorldPosition();
+
+		//BaseComp because Collisioncomp is not yet defined
+		BaseComponent* m_pCollisionComponent;
 	};
 
 	class RenderComponent final : public BaseComponent
@@ -216,5 +225,36 @@ namespace dae
 		//keep pointers or reference to a texture and a text component. Give interface for setting a texture or a text which is then set on the rendercomponent.
 		//writing functionality in Notify would make the UIComponent unusable.
 		//instead make it a pure virtual base class. A project would inherit from this and add it's own functionality in its notify.
+	};
+
+	//default collision is a small cube at on top of gameObject
+	class CollisionComponent : public BaseComponent
+	{
+	public:
+		CollisionComponent(GameObject* pGameObject);
+
+		virtual ~CollisionComponent() {};
+		CollisionComponent(const CollisionComponent& other) = delete;
+		CollisionComponent(CollisionComponent&& other) = delete;
+		CollisionComponent& operator=(const CollisionComponent& other) = delete;
+		CollisionComponent& operator=(CollisionComponent&& other) = delete;
+
+		virtual void Update(const float) override;
+		virtual void LateUpdate(const float) override {};
+
+		void SetPoints(glm::vec2& leftBottom, glm::vec2& rightBottom, glm::vec2& leftTop, glm::vec2& rightTop, bool areWorldPositions = false);
+		void AddDisplacement(const glm::vec2& displacement);
+
+		void SetOverlapCallbackFunction(std::function<void(GameObject* pOtherObject)> pOverlapFunction) { m_pCallbackFunction = pOverlapFunction; }
+
+		bool IsOverlapping(const glm::vec2& leftBottom, const glm::vec2& rightBottom, const glm::vec2& leftTop, const glm::vec2& rightTop) const;
+
+	private:
+		glm::vec2 m_Points[4];
+		static std::vector<CollisionComponent*> m_pAllCollisionComponents;
+
+		std::function<void(GameObject* pOtherObject)> m_pCallbackFunction;
+
+		TransformComponent* m_pTransformComponent;
 	};
 }
