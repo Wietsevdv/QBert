@@ -89,6 +89,7 @@ void load()
 	pSS->Load(0, "fall.mp3", 16);
 
 	std::cout << "\n\nPress 'v' to play a sound\n";
+
 }
 
 int main(int, char* []) {
