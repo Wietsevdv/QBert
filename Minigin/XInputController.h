@@ -30,6 +30,8 @@ namespace dae
 		bool WentUpThisFrame(ControllerButtons button) const;
 		bool IsPressed(ControllerButtons button) const;
 
+		int GetIndex() const;
+
 	private:
 		XInputControllerImpl* m_pImpl;
 	};

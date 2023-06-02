@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 
 #include "ResourceManager.h"
+#include "InputManager.h"
 #include "XInputController.h"
 #include "Subject.h"
 
@@ -198,9 +199,18 @@ namespace dae
 
 		XInputController* GetController() const { return m_pController.get(); }
 
+	    template <class Command>
+		void BindButtonToCommand(ControllerButtons button, ButtonState state);
+
 	private:
 		std::unique_ptr<XInputController> m_pController{};
 	};
+
+	template <class Command>
+	inline void ControllerComponent::BindButtonToCommand(ControllerButtons button, ButtonState state)
+	{
+		InputManager::GetInstance().BindControllerButtonToCommand<Command>(GetController()->GetIndex(), button, state);
+	}
 
 	class UIComponent final : public BaseComponent, public Observer
 	{

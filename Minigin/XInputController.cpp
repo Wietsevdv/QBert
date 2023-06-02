@@ -27,6 +27,8 @@ public:
 	bool WentUpThisFrame(ControllerButtons button) const;
 	bool IsPressed(ControllerButtons button) const;
 
+	int GetIndex() const { return static_cast<int>(m_ControllerIdx); }
+
 private:
 	DWORD m_ControllerIdx;
 
@@ -106,4 +108,9 @@ bool dae::XInputController::WentUpThisFrame(ControllerButtons button) const
 bool dae::XInputController::IsPressed(ControllerButtons button) const
 {
 	return m_pImpl->IsPressed(button);
+}
+
+int dae::XInputController::GetIndex() const
+{
+	return m_pImpl->GetIndex();
 }

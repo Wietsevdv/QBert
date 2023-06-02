@@ -36,40 +36,13 @@ namespace dae
 		void Add(const glm::vec3& direction) { m_Velocity += direction; }
 		void Land();
 
+		const glm::vec3& GetVelocity() const { return m_Velocity; }
+
 	private:
 		glm::vec3 m_Velocity;
 
 		//QUICK ACCESS (no ownership)
 		TransformComponent* m_pTransformComponent;
-	};
-
-	class PlayerComponent final : public BaseComponent
-	{
-	public:
-		PlayerComponent(GameObject* pGameObject)
-			: BaseComponent(pGameObject)
-			, m_NrOfLives{ 3 }
-			, m_Score{ 0 }
-		{};
-
-		virtual ~PlayerComponent() {};
-		PlayerComponent(const PlayerComponent& other) = delete;
-		PlayerComponent(PlayerComponent&& other) = delete;
-		PlayerComponent& operator=(const PlayerComponent& other) = delete;
-		PlayerComponent& operator=(PlayerComponent&& other) = delete;
-
-		virtual void Update(const float) override {};
-		virtual void LateUpdate(const float) override {};
-
-		int GetNrOfLives() const { return m_NrOfLives; }
-		int GetScore() const { return m_Score; }
-
-		void LoseLifePoint();
-		void IncreaseScore(int amount);
-
-	private:
-		int m_NrOfLives;
-		int m_Score;
 	};
 
 	class GravityComponent final : public BaseComponent
@@ -99,6 +72,41 @@ namespace dae
 		MovementComponent* m_pMovementComponent;
 	};
 
+	class PlayerComponent final : public BaseComponent
+	{
+	public:
+		PlayerComponent(GameObject* pGameObject);
+
+		virtual ~PlayerComponent() {};
+		PlayerComponent(const PlayerComponent& other) = delete;
+		PlayerComponent(PlayerComponent&& other) = delete;
+		PlayerComponent& operator=(const PlayerComponent& other) = delete;
+		PlayerComponent& operator=(PlayerComponent&& other) = delete;
+
+		virtual void Update(const float) override {};
+		virtual void LateUpdate(const float) override {};
+
+		int GetNrOfLives() const { return m_NrOfLives; }
+		int GetScore() const { return m_Score; }
+
+		void LoseLifePoint();
+		void IncreaseScore(int amount);
+
+		void JumpRightUp();
+		void JumpLeftUp();
+		void JumpRightDown();
+		void JumpLeftDown();
+
+
+	private:
+		int m_NrOfLives;
+		int m_Score;
+
+		MovementComponent* m_pMovementComponent;
+		GravityComponent* m_pGravityComponent;
+		TextureComponent* m_pTextureComponent;
+	};
+
 	class PlayerCollisionComponent final : public CollisionComponent
 	{
 	public:
@@ -118,6 +126,7 @@ namespace dae
 	private:
 		MovementComponent* m_pMovementComponent;
 		GravityComponent* m_pGravityComponent;
+		TransformComponent* m_pTransformComponent;
 	};
 
 	class CubeComponent final : public BaseComponent

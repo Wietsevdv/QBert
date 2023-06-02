@@ -1,6 +1,8 @@
 #include "Commands.h"
 #include "GameObject.h"
 
+#include <iostream>
+
 void dae::AddDirectionCommand::Execute(GameObject* /*pPlayer*/, void* /*pData*/)
 {
 	//glm::vec3* pDirection = static_cast<glm::vec3*>(pData);

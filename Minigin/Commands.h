@@ -25,4 +25,5 @@ namespace dae
 	{
 		virtual void Execute(GameObject* pPlayer, void* pData) override;
 	};
+
 }
