@@ -46,9 +46,11 @@ void load()
 	pBlockTexture->SetTexture("Block_Blue_1.png");
 
 	TransformComponent* pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(250.f, 300.f, 0.f);
+	pBlockTransformComp->SetLocalPosition(320.f, 200.f, 0.f);
 
-	blockGO->AddComponent<CubeComponent>(blockGO.get());
+	CubeComponent* pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
+	pCubeComponent->SetIsRightEdgeCube();
+	pCubeComponent->SetIsLeftEdgeCube();
 
 	//collisionComp
 	CollisionComponent* pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
@@ -68,25 +70,10 @@ void load()
 	pBlockTexture->SetTexture("Block_Blue_1.png");
 
 	pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(266.f, 324.f, 0.f);
+	pBlockTransformComp->SetLocalPosition(336.f, 224.f, 0.f);
 
-	blockGO->AddComponent<CubeComponent>(blockGO.get());
-
-	//collisionComp
-	pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
-	pCollisionComp->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
-
-	scene.Add(blockGO);
-
-	//BLOCK LEFT
-	blockGO = std::make_shared<GameObject>();
-	pBlockTexture = blockGO->AddComponent<TextureComponent>(blockGO.get());
-	pBlockTexture->SetTexture("Block_Blue_1.png");
-
-	pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(234.f, 324.f, 0.f);
-
-	blockGO->AddComponent<CubeComponent>(blockGO.get());
+	pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
+	pCubeComponent->SetIsRightEdgeCube();
 
 	//collisionComp
 	pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
@@ -100,9 +87,27 @@ void load()
 	pBlockTexture->SetTexture("Block_Blue_1.png");
 
 	pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(250.f, 348.f, 0.f);
+	pBlockTransformComp->SetLocalPosition(304.f, 224.f, 0.f);
 
-	blockGO->AddComponent<CubeComponent>(blockGO.get());
+	pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
+	pCubeComponent->SetIsLeftEdgeCube();
+
+	//collisionComp
+	pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
+	pCollisionComp->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
+
+	scene.Add(blockGO);
+
+	//BLOCK BOTTOM
+	blockGO = std::make_shared<GameObject>();
+	pBlockTexture = blockGO->AddComponent<TextureComponent>(blockGO.get());
+	pBlockTexture->SetTexture("Block_Blue_1.png");
+
+	pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
+	pBlockTransformComp->SetLocalPosition(320.f, 248.f, 0.f);
+
+	pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
+	pCubeComponent->SetIsBottomEdgeCube();
 
 	//collisionComp
 	pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
@@ -116,11 +121,10 @@ void load()
 	TextureComponent* pTexture = go->AddComponent<TextureComponent>(go.get());
 	pTexture->SetTexture("Q-BertLeftDownStand.png");
 
-	go->AddComponent<ProjectComponent>(go.get());
 	UIComponent* pUIcomp = go->AddComponent<UIComponent>(go.get());
 
 	TransformComponent* pTransformComp = go->GetComponent<TransformComponent>();
-	pTransformComp->SetLocalPosition(250.f, 50.f, 0.f);
+	pTransformComp->SetLocalPosition(320.f, 50.f, 0.f);
 
 	go->AddComponent<GravityComponent>(go.get());
 	go->AddComponent<PlayerComponent>(go.get());
@@ -149,7 +153,7 @@ void load()
 	dae::SoundSystem* pSS = dae::ServiceLocator::GetSoundSystem();
 	
 	pSS->Load(0, "fall.mp3", 16);
-	pSS->Load(1, "jump.mp3", 16);
+	pSS->Load(1, "jump.wav", 16);
 
 	std::cout << "\n\nPress 'v' to play a sound\n";
 

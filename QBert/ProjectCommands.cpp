@@ -6,32 +6,32 @@
 
 void dae::JumpRightUpCommand::Execute(GameObject* pPlayer, void* /*pData*/)
 {
-	if (PlayerComponent* pPlayerComponent = dynamic_cast<PlayerComponent*>(pPlayer->GetComponent<PlayerComponent>()))
+	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
 	{
-		pPlayerComponent->JumpRightUp();
+		pMovementComponent->JumpRightUp();
 	}
 }
 
 void dae::JumpLeftUpCommand::Execute(GameObject* pPlayer, void* /*pData*/)
 {
-	if (PlayerComponent* pPlayerComponent = dynamic_cast<PlayerComponent*>(pPlayer->GetComponent<PlayerComponent>()))
+	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
 	{
-		pPlayerComponent->JumpLeftUp();
+		pMovementComponent->JumpLeftUp();
 	}
 }
 
 void dae::JumpRightDownCommand::Execute(GameObject* pPlayer, void* /*pData*/)
 {
-	if (PlayerComponent* pPlayerComponent = dynamic_cast<PlayerComponent*>(pPlayer->GetComponent<PlayerComponent>()))
+	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
 	{
-		pPlayerComponent->JumpRightDown();
+		pMovementComponent->JumpRightDown();
 	}
 }
 
 void dae::JumpLeftDownCommand::Execute(GameObject* pPlayer, void* /*pData*/)
 {
-	if (PlayerComponent* pPlayerComponent = dynamic_cast<PlayerComponent*>(pPlayer->GetComponent<PlayerComponent>()))
+	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
 	{
-		pPlayerComponent->JumpLeftDown();
+		pMovementComponent->JumpLeftDown();
 	}
 }

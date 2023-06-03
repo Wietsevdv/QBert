@@ -3,19 +3,38 @@
 
 namespace dae
 {
-	class ProjectComponent final : public BaseComponent
+	class CubeComponent final : public BaseComponent
 	{
 	public:
-		ProjectComponent(GameObject* pGameObject) : BaseComponent(pGameObject) {};
+		CubeComponent(GameObject* pGameObject)
+			: BaseComponent{ pGameObject }
+			, m_IsBottomEdgeCube{ false }
+			, m_IsRightEdgeCube{ false }
+			, m_IsLeftEdgeCube{ false }
+		{
+		};
 
-		virtual ~ProjectComponent() {};
-		ProjectComponent(const ProjectComponent& other) = delete;
-		ProjectComponent(ProjectComponent&& other) = delete;
-		ProjectComponent& operator=(const ProjectComponent& other) = delete;
-		ProjectComponent& operator=(ProjectComponent&& other) = delete;
+		virtual ~CubeComponent() {};
+		CubeComponent(const CubeComponent& other) = delete;
+		CubeComponent(CubeComponent&& other) = delete;
+		CubeComponent& operator=(const CubeComponent& other) = delete;
+		CubeComponent& operator=(CubeComponent&& other) = delete;
 
-		virtual void Update(const float) override;
+		virtual void Update(const float) override {};
 		virtual void LateUpdate(const float) override {};
+
+		void SetIsBottomEdgeCube() { m_IsBottomEdgeCube = true; }
+		void SetIsRightEdgeCube() { m_IsRightEdgeCube = true; }
+		void SetIsLeftEdgeCube() { m_IsLeftEdgeCube = true; }
+
+		bool IsBottomEdgeCube() const { return m_IsBottomEdgeCube; }
+		bool IsRightEdgeCube() const { return m_IsRightEdgeCube; }
+		bool IsLeftEdgeCube() const { return m_IsLeftEdgeCube; }
+
+	private:
+		bool m_IsBottomEdgeCube;
+		bool m_IsRightEdgeCube;
+		bool m_IsLeftEdgeCube;
 	};
 
 	class MovementComponent final : public BaseComponent
@@ -34,15 +53,28 @@ namespace dae
 
 		//Don't multiply your direction with deltaT. This is done when adding the complete velocity to the gameObject in LateUpdate()
 		void Add(const glm::vec3& direction) { m_Velocity += direction; }
-		void Land();
+		void Land(CubeComponent* pCubeComponent);
 
 		const glm::vec3& GetVelocity() const { return m_Velocity; }
 
+		void JumpRightUp();
+		void JumpLeftUp();
+		void JumpRightDown();
+		void JumpLeftDown();
+
+		bool IsFallingToDeath() const { return m_IsFallingToDeath; }
+
 	private:
 		glm::vec3 m_Velocity;
+		bool m_IsFallingToDeath;
+
+		void FallOff();
 
 		//QUICK ACCESS (no ownership)
 		TransformComponent* m_pTransformComponent;
+		CubeComponent* m_pCubeComponentLanded;
+		TextureComponent* m_pTextureComponent;
+		RenderComponent* m_pRenderComponent;
 	};
 
 	class GravityComponent final : public BaseComponent
@@ -60,8 +92,6 @@ namespace dae
 		virtual void LateUpdate(const float) override {};
 
 		void SetDirection(const glm::vec3& direction) { m_Direction = direction; }
-
-		void SetGravityOn(bool gravityOn = true) { m_On = gravityOn; }
 
 	private:
 		glm::vec3 m_Direction;
@@ -92,19 +122,9 @@ namespace dae
 		void LoseLifePoint();
 		void IncreaseScore(int amount);
 
-		void JumpRightUp();
-		void JumpLeftUp();
-		void JumpRightDown();
-		void JumpLeftDown();
-
-
 	private:
 		int m_NrOfLives;
 		int m_Score;
-
-		MovementComponent* m_pMovementComponent;
-		GravityComponent* m_pGravityComponent;
-		TextureComponent* m_pTextureComponent;
 	};
 
 	class PlayerCollisionComponent final : public CollisionComponent
@@ -127,25 +147,5 @@ namespace dae
 		MovementComponent* m_pMovementComponent;
 		GravityComponent* m_pGravityComponent;
 		TransformComponent* m_pTransformComponent;
-	};
-
-	class CubeComponent final : public BaseComponent
-	{
-	public:
-		CubeComponent(GameObject* pGameObject)
-			: BaseComponent{ pGameObject }
-		{
-		};
-
-		virtual ~CubeComponent() {};
-		CubeComponent(const CubeComponent& other) = delete;
-		CubeComponent(CubeComponent&& other) = delete;
-		CubeComponent& operator=(const CubeComponent& other) = delete;
-		CubeComponent& operator=(CubeComponent&& other) = delete;
-
-		virtual void Update(const float) override {};
-		virtual void LateUpdate(const float) override {};
-
-	private:
 	};
 }

@@ -5,6 +5,7 @@
 #include "Font.h"
 #include "Texture2D.h"
 #include "XInputController.h"
+#include "Scene.h"
 
 #include "iostream"
 
@@ -53,6 +54,13 @@ void dae::TransformComponent::UpdateWorldPosition()
 		m_WorldPosition = pOwnerParent->GetWorldPosition() + m_LocalPosition;
 
 	m_PositionIsDirty = false;
+}
+
+dae::RenderComponent::RenderComponent(GameObject* pGameObject)
+	: BaseComponent{ pGameObject }
+	, m_Layer{ 1 }
+{
+	SceneManager::GetInstance().GetActiveScene()->AddRenderComponent(this);
 }
 
 void dae::RenderComponent::Render(float x, float y)
