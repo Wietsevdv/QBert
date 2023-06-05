@@ -232,6 +232,8 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Services.h" />
     <ClInclude Include="Singleton.h" />
+    <ClInclude Include="StateMachine.h" />
+    <ClInclude Include="StateMachineManager.h" />
     <ClInclude Include="Subject.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="XInputController.h" />
@@ -258,6 +260,8 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Services.cpp" />
+    <ClCompile Include="StateMachine.cpp" />
+    <ClCompile Include="StateMachineManager.cpp" />
     <ClCompile Include="Subject.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="XInputController.cpp" />

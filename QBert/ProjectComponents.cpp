@@ -63,7 +63,10 @@ void dae::MovementComponent::JumpRightUp()
 		m_pTextureComponent->SetTexture("Q-BertRightUpJump.png");
 
 		if (m_pCubeComponentLanded->IsRightEdgeCube())
+		{
 			FallOff();
+			m_pRenderComponent->SetLayer(0);
+		}
 	}
 }
 
@@ -76,7 +79,10 @@ void dae::MovementComponent::JumpLeftUp()
 		m_pTextureComponent->SetTexture("Q-BertLeftUpJump.png");
 
 		if (m_pCubeComponentLanded->IsLeftEdgeCube())
+		{
 			FallOff();
+			m_pRenderComponent->SetLayer(0);
+		}
 
 	}
 }
@@ -113,8 +119,6 @@ void dae::MovementComponent::FallOff()
 
 	dae::SoundSystem* pSS = dae::ServiceLocator::GetSoundSystem();
 	pSS->Play(0);
-
-	m_pRenderComponent->SetLayer(0);
 }
 
 dae::PlayerComponent::PlayerComponent(GameObject* pGameObject)

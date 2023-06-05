@@ -20,81 +20,44 @@ int dae::InputManager::GetNrOfControllers() const
 
 bool dae::InputManager::ProcessInput()
 {
-	SoundSystem* pSS = ServiceLocator::GetSoundSystem();
+	//ImGui_ImplSDL2_ProcessEvent(&e);
 
+	CheckBoundButtons();
+	return CheckBoundKeys();
+}
+
+bool dae::InputManager::CheckBoundKeys()
+{
 	SDL_Event e;
-	while (SDL_PollEvent(&e)) {
-		if (e.type == SDL_QUIT) 
+	while (SDL_PollEvent(&e)) 
+	{
+		if (e.type == SDL_QUIT)
 		{
 			return false;
 		}
-		if (e.type == SDL_KEYDOWN) 
+		for (boundSDLKey& boundKey : m_BoundSDLKeys)
 		{
-			//if (e.key.keysym.sym == SDLK_s)
-			//{
-			//	glm::vec3 vector{ 0, 1, 0 };
-			//	GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-			//	m_ButtonCommandmap.find(ControllerButtons::DDown)->second.get()->Execute(pOwner, &vector);
-			//}
-			//if (e.key.keysym.sym == SDLK_w)
-			//{
-			//	glm::vec3 vector{ 0, -1, 0 };
-			//	GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-			//	m_ButtonCommandmap.find(ControllerButtons::DUp)->second.get()->Execute(pOwner, &vector);
-			//}
-			//if (e.key.keysym.sym == SDLK_a)
-			//{
-			//	glm::vec3 vector{ -1, 0, 0 };
-			//	GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-			//	m_ButtonCommandmap.find(ControllerButtons::DLeft)->second.get()->Execute(pOwner, &vector);
-			//}
-			//if (e.key.keysym.sym == SDLK_d)
-			//{
-			//	glm::vec3 vector{ 1, 0, 0 };
-			//	GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-			//	m_ButtonCommandmap.find(ControllerButtons::DRight)->second.get()->Execute(pOwner, &vector);
-			//}
-			if (e.key.keysym.sym == SDLK_v)
+			if (*boundKey.pKey.get() == e.key.keysym.sym)
 			{
-				pSS->Play(0);
+				switch (boundKey.buttonState)
+				{
+					case ButtonState::held:
+					case ButtonState::pressed:
+					{
+						if (e.type == SDL_KEYDOWN)
+							boundKey.pCommand->Execute(m_pControllerComponents[boundKey.playerIndex]->GetOwner(), nullptr);
+					}
+					break;
+					case ButtonState::released:
+					{
+						if (e.type == SDL_KEYUP)
+							boundKey.pCommand->Execute(m_pControllerComponents[boundKey.playerIndex]->GetOwner(), nullptr);
+					}
+					break;
+				}
 			}
 		}
-		/*if (e.type == SDL_KEYUP)
-		{
-			if (e.key.keysym.sym == SDLK_s)
-			{
-				glm::vec3 vector{ 0, -1, 0 };
-				GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-				m_ButtonCommandmap.find(ControllerButtons::DDown)->second.get()->Execute(pOwner, &vector);
-			}
-			if (e.key.keysym.sym == SDLK_w)
-			{
-				glm::vec3 vector{ 0, 1, 0 };
-				GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-				m_ButtonCommandmap.find(ControllerButtons::DUp)->second.get()->Execute(pOwner, &vector);
-			}
-			if (e.key.keysym.sym == SDLK_a)
-			{
-				glm::vec3 vector{ 1, 0, 0 };
-				GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-				m_ButtonCommandmap.find(ControllerButtons::DLeft)->second.get()->Execute(pOwner, &vector);
-			}
-			if (e.key.keysym.sym == SDLK_d)
-			{
-				glm::vec3 vector{ -1, 0, 0 };
-				GameObject* pOwner = m_pControllerComponents[1]->GetOwner();
-				m_ButtonCommandmap.find(ControllerButtons::DRight)->second.get()->Execute(pOwner, &vector);
-			}
-		}*/
-		if (e.type == SDL_MOUSEBUTTONDOWN)
-		{
-			
-		}
-		// ImGui
-		ImGui_ImplSDL2_ProcessEvent(&e);
 	}
-
-	CheckBoundButtons();
 
 	return true;
 }

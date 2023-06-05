@@ -9,6 +9,7 @@
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include "StateMachineManager.h"
 #include "Services.h"
 #include <chrono>
 #include <thread>
@@ -76,6 +77,8 @@ dae::Minigin::~Minigin()
 {
 	ServiceLocator::CleanUp();
 
+	//its possible the state machines might cause memory leaks
+
 	Renderer::GetInstance().Destroy();
 	SDL_DestroyWindow(g_window);
 	g_window = nullptr;
@@ -89,6 +92,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	auto& renderer = Renderer::GetInstance();
 	auto& sceneManager = SceneManager::GetInstance();
 	auto& input = InputManager::GetInstance();
+	auto& stateMachineManager = StateMachineManager::GetInstance();
 
 	const int desiredFPS{ 144 };
 	const int frameTimeMs{ 1000 / desiredFPS };
@@ -104,6 +108,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 		doContinue = input.ProcessInput();
 		sceneManager.Update(deltaTime);
+		stateMachineManager.Update(deltaTime);
 		sceneManager.LateUpdate(deltaTime);
 		renderer.Render();
 		
