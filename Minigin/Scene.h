@@ -1,11 +1,12 @@
 #pragma once
 #include "SceneManager.h"
+#include <vector>
+#include <map>
 
 namespace dae
 {
 	class GameObject;
 	class Observer;
-	class RenderComponent;
 
 	class Scene final
 	{
@@ -23,7 +24,7 @@ namespace dae
 		void LateUpdate(const float deltaT);
 		void Render() const;
 
-		void AddRenderComponent(RenderComponent* pRenderComponent);
+		void LayerGameObjects() { m_LayerGameObjects = true; }
 
 		~Scene();
 		Scene(const Scene& other) = delete;
@@ -35,10 +36,11 @@ namespace dae
 		explicit Scene(const std::string& name);
 
 		std::string m_name;
-		std::vector < std::shared_ptr<GameObject>> m_objects{};
-		std::vector <std::shared_ptr<Observer>> m_Observers{};
+		std::vector<std::shared_ptr<GameObject>> m_objects{};
+		std::vector<std::shared_ptr<Observer>> m_Observers{};
 
-		std::vector<RenderComponent*> m_RenderComponents;
+		bool m_LayerGameObjects;
+		std::map<int, std::vector<const GameObject*>> m_LayeredGameObjects;
 
 		static unsigned int m_idCounter; 
 	};

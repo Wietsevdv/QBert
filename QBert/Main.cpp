@@ -142,17 +142,6 @@ void load()
 	pQBertControllerComponent->BindButtonToCommand<JumpRightDownCommand>(ControllerButtons::DDown, ButtonState::pressed);
 	pQBertControllerComponent->BindButtonToCommand<JumpLeftDownCommand>(ControllerButtons::DLeft, ButtonState::pressed);
 
-	std::shared_ptr<SDL_Event> pJumpEvent = std::make_shared<SDL_Event>();
-	pJumpEvent->type = SDL_KEYDOWN;
-	pJumpEvent->key.keysym.sym = SDLK_k;
-
-	std::shared_ptr<SDL_Event> pOtherJumpEvent = std::make_shared<SDL_Event>();
-	pOtherJumpEvent->type = SDL_MOUSEBUTTONDOWN;
-	pOtherJumpEvent->button.button = SDL_BUTTON_LEFT;
-
-	InputManager::GetInstance().BindSDLEventToCommand<JumpRightUpCommand>(0, pJumpEvent);
-	InputManager::GetInstance().BindSDLEventToCommand<JumpRightDownCommand>(0, pOtherJumpEvent);
-
 	scene.Add(go);
 
 	Subject* pSubject = go->MakeSubject();
@@ -168,6 +157,20 @@ void load()
 
 	std::cout << "\n\nPress 'v' to play a sound\n";
 
+	//-----------------------MAIN MENU SCENE--------------------------------
+	auto& mainMenuScene = SceneManager::GetInstance().CreateScene("MainMenuScene", false);
+
+	auto blockie = std::make_shared<GameObject>();
+	blockie->AddComponent<TransformComponent>(blockie.get())->SetLocalPosition(100.f, 100.f, 0.f);
+	blockie->AddComponent<TextureComponent>(blockie.get())->SetTexture("Block_Blue_1.png");
+
+	mainMenuScene.Add(blockie);
+
+	std::shared_ptr<SDL_Event> pChangeMenuEvent = std::make_shared<SDL_Event>();
+	pChangeMenuEvent->type = SDL_MOUSEBUTTONDOWN;
+	pChangeMenuEvent->button.button = SDL_BUTTON_LEFT;
+
+	InputManager::GetInstance().BindSDLEventToCommand<ChangeSceneCommand>(0, pChangeMenuEvent);
 }
 
 int main(int, char* []) {

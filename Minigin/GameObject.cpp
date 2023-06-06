@@ -79,3 +79,8 @@ dae::Subject* dae::GameObject::MakeSubject()
 	m_pSubject = std::make_unique<Subject>();
 	return m_pSubject.get();
 }
+
+int dae::GameObject::GetLayer() const
+{
+	return m_pRenderComponent->GetLayer();
+}

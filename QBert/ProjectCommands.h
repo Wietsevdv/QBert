@@ -22,4 +22,9 @@ namespace dae
 	{
 		virtual void Execute(GameObject* pPlayer, void* pData) override;
 	};
+
+	class ChangeSceneCommand final : public Command
+	{
+		virtual void Execute(GameObject* pPlayer, void* pData) override;
+	};
 }

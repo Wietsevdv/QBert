@@ -45,7 +45,7 @@ namespace dae
 		BaseState* m_pTo;
 	};
 
-	class StateMachine final
+	class StateMachine
 	{
 	public:
 		StateMachine() = default;

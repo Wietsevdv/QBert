@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <map>
 #include <string>
 #include <memory>
 #include "Singleton.h"
@@ -16,12 +16,14 @@ namespace dae
 		void LateUpdate(const float deltaT);
 		void Render();
 
-		 Scene* GetActiveScene() const { return m_pActiveScene; }
+		Scene* GetActiveScene() const { return m_pActiveScene; }
+
+		void SetActiveScene(const std::string& name);
 
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
-		std::vector<std::shared_ptr<Scene>> m_scenes;
+		std::map<const std::string, std::shared_ptr<Scene>> m_scenes;
 		Scene* m_pActiveScene{ nullptr };
 	};
 }

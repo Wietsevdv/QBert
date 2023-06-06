@@ -2,13 +2,14 @@
 #include "GameObject.h"
 #include "Observers.h"
 
-#include <map>
-
 using namespace dae;
 
 unsigned int Scene::m_idCounter = 0;
 
-Scene::Scene(const std::string& name) : m_name(name) {}
+Scene::Scene(const std::string& name) 
+	: m_name(name) 
+	, m_LayerGameObjects{ true }
+{}
 
 Scene::~Scene() = default;
 
@@ -48,6 +49,18 @@ void Scene::Update(const float deltaT)
 	{
 		object->Update(deltaT);
 	}
+
+	//add functionality to only do this check every time a RenderComp changed its layer. Simple dirtyflag can be used
+	if (m_LayerGameObjects)
+	{
+		m_LayeredGameObjects.clear();
+		for (auto& go : m_objects)
+		{
+			m_LayeredGameObjects[go->GetLayer()].emplace_back(go.get());
+		}
+
+		m_LayerGameObjects = false;
+	}
 }
 
 void dae::Scene::LateUpdate(const float deltaT)
@@ -67,28 +80,11 @@ void dae::Scene::LateUpdate(const float deltaT)
 
 void Scene::Render() const
 {
-	//Get all rendercomponents in order of their layer
-	std::map<int, std::vector<RenderComponent*>> layeredComponents;
-	layeredComponents[0].reserve(10);
-	layeredComponents[1].reserve(50);
-	layeredComponents[1].reserve(10);
-
-	for (RenderComponent* rc : m_RenderComponents)
+	for (auto& goL : m_LayeredGameObjects)
 	{
-		layeredComponents[rc->GetLayer()].push_back(rc);
-	}
-
-	//Render them
-	for (auto layer : layeredComponents)
-	{
-		for (auto rc : layer.second)
+		for (auto& go : goL.second)
 		{
-			rc->GetOwner()->Render(); //call render on owner because owner passes location data
+			go->Render();
 		}
 	}
-}
-
-void dae::Scene::AddRenderComponent(RenderComponent* pRenderComponent)
-{
-	m_RenderComponents.push_back(pRenderComponent);
 }

@@ -60,7 +60,6 @@ dae::RenderComponent::RenderComponent(GameObject* pGameObject)
 	: BaseComponent{ pGameObject }
 	, m_Layer{ 1 }
 {
-	SceneManager::GetInstance().GetActiveScene()->AddRenderComponent(this);
 }
 
 void dae::RenderComponent::Render(float x, float y)
@@ -69,6 +68,12 @@ void dae::RenderComponent::Render(float x, float y)
 	float renderPosX = x - textureSize.x / 2.f;
 	float renderPosY = y - textureSize.y;
 	Renderer::GetInstance().RenderTexture(*m_pTexture.get(), renderPosX, renderPosY);
+}
+
+void dae::RenderComponent::SetLayer(int newLayer)
+{
+	m_Layer = newLayer;
+	SceneManager::GetInstance().GetActiveScene()->LayerGameObjects();
 }
 
 dae::TextureComponent::TextureComponent(GameObject* pGameObject)

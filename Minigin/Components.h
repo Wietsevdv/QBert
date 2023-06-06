@@ -90,7 +90,7 @@ namespace dae
 	class RenderComponent final : public BaseComponent
 	{
 	public:
-		RenderComponent(GameObject* pGameObject);// : BaseComponent(pGameObject) {};
+		RenderComponent(GameObject* pGameObject);
 
 		virtual ~RenderComponent() {};
 		RenderComponent(const RenderComponent& other) = delete;
@@ -104,7 +104,7 @@ namespace dae
 		void SetTexture(std::shared_ptr<Texture2D> pTexture) { m_pTexture = pTexture; }
 		void Render(float x, float y);
 
-		void SetLayer(int newLayer) { m_Layer = newLayer; }
+		void SetLayer(int newLayer);
 		int GetLayer() const { return m_Layer; }
 
 	private:

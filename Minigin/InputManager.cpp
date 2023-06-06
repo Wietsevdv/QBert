@@ -44,7 +44,9 @@ bool dae::InputManager::CheckBoundEvents()
 			}
 			else if (pEvent->type == e.type && pEvent->button.button == e.button.button) //mouse
 			{
-				boundEvent.pCommand->Execute(m_pControllerComponents[boundEvent.playerIndex]->GetOwner(), nullptr);
+				Sint32 mousePos[2]{ e.button.x, e.button.y };
+	
+				boundEvent.pCommand->Execute(m_pControllerComponents[boundEvent.playerIndex]->GetOwner(), mousePos);
 			}
 		}
 	}

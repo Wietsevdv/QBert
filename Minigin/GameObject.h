@@ -38,6 +38,8 @@ namespace dae
 		void SetDead() { m_IsDead = true; }
 		bool GetIsDead() const { return m_IsDead; }
 
+		int GetLayer() const;
+
 		GameObject();
 		virtual ~GameObject();
 		GameObject(const GameObject& other) = delete;
