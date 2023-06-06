@@ -7,7 +7,7 @@
 #include <map>
 #include <memory>
 
-#include "SDL_keycode.h"
+#include "SDL_events.h"
 
 namespace dae
 {
@@ -22,11 +22,10 @@ namespace dae
 
 	class InputManager final : public Singleton<InputManager>
 	{
-		struct boundSDLKey
+		struct boundSDLEvent
 		{
 			int playerIndex;
-			std::shared_ptr<SDL_Keycode> pKey;
-			ButtonState buttonState;
+			std::shared_ptr<SDL_Event> pEvent;
 			std::shared_ptr<Command> pCommand;
 		};
 		struct boundControllerButton
@@ -44,7 +43,7 @@ namespace dae
 		int GetNrOfControllers() const;
 
 		template <class Command>
-		void BindSDLKeyToCommand(int playerIdx, std::shared_ptr<SDL_Keycode> pKey, ButtonState state);
+		void BindSDLEventToCommand(int playerIdx, std::shared_ptr<SDL_Event> pKey);
 
 		template <class Command>
 		void BindControllerButtonToCommand(int controllerIdx, ControllerButtons button, ButtonState state);
@@ -52,25 +51,25 @@ namespace dae
 	private:
 		std::vector<ControllerComponent*> m_pControllerComponents;
 
-		std::vector<boundSDLKey> m_BoundSDLKeys;
+		std::vector<boundSDLEvent> m_BoundSDL_Events;
 		std::vector<boundControllerButton> m_BoundControllerButtons;
 
 		std::vector<std::unique_ptr<Command>> m_pCommands;
 
-		bool CheckBoundKeys();
+		bool CheckBoundEvents();
 		void CheckBoundButtons();
 	};
 
 
 
 	template <class Command>
-	inline void InputManager::BindSDLKeyToCommand(int playerIdx, std::shared_ptr<SDL_Keycode> pKey, ButtonState state)
+	inline void InputManager::BindSDLEventToCommand(int playerIdx, std::shared_ptr<SDL_Event> pKey)
 	{
-		for (boundSDLKey& boundKey : m_BoundSDLKeys)
+		for (boundSDLEvent& boundEvent : m_BoundSDL_Events)
 		{
-			if (dynamic_cast<Command*>(boundKey.pCommand))
+			if (dynamic_cast<Command*>(boundEvent.pCommand.get()))
 			{
-				m_BoundSDLKeys.emplace_back(playerIdx, pKey, state, boundKey.pCommand);
+				m_BoundSDL_Events.emplace_back(playerIdx, pKey, boundEvent.pCommand);
 				return;
 			}
 		}
@@ -78,12 +77,12 @@ namespace dae
 		{
 			if (dynamic_cast<Command*>(boundButton.pCommand.get()))
 			{
-				m_BoundSDLKeys.emplace_back(playerIdx, pKey, state, boundButton.pCommand);
+				m_BoundSDL_Events.emplace_back(playerIdx, pKey, boundButton.pCommand);
 				return;
 			}
 		}
 
-		m_BoundSDLKeys.emplace_back(playerIdx, pKey, state, std::make_shared<Command>());
+		m_BoundSDL_Events.emplace_back(playerIdx, pKey, std::make_shared<Command>());
 	}
 
 	template <class Command>
@@ -98,11 +97,11 @@ namespace dae
 				return;
 			}
 		}
-		for (boundSDLKey& boundKey : m_BoundSDLKeys)
+		for (boundSDLEvent& boundEvent : m_BoundSDL_Events)
 		{
-			if (dynamic_cast<Command*>(boundKey.pCommand.get()))
+			if (dynamic_cast<Command*>(boundEvent.pCommand.get()))
 			{
-				m_BoundControllerButtons.emplace_back(controllerIdx, button, state, boundKey.pCommand);
+				m_BoundControllerButtons.emplace_back(controllerIdx, button, state, boundEvent.pCommand);
 				return;
 			}
 		}

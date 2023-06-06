@@ -142,6 +142,17 @@ void load()
 	pQBertControllerComponent->BindButtonToCommand<JumpRightDownCommand>(ControllerButtons::DDown, ButtonState::pressed);
 	pQBertControllerComponent->BindButtonToCommand<JumpLeftDownCommand>(ControllerButtons::DLeft, ButtonState::pressed);
 
+	std::shared_ptr<SDL_Event> pJumpEvent = std::make_shared<SDL_Event>();
+	pJumpEvent->type = SDL_KEYDOWN;
+	pJumpEvent->key.keysym.sym = SDLK_k;
+
+	std::shared_ptr<SDL_Event> pOtherJumpEvent = std::make_shared<SDL_Event>();
+	pOtherJumpEvent->type = SDL_MOUSEBUTTONDOWN;
+	pOtherJumpEvent->button.button = SDL_BUTTON_LEFT;
+
+	InputManager::GetInstance().BindSDLEventToCommand<JumpRightUpCommand>(0, pJumpEvent);
+	InputManager::GetInstance().BindSDLEventToCommand<JumpRightDownCommand>(0, pOtherJumpEvent);
+
 	scene.Add(go);
 
 	Subject* pSubject = go->MakeSubject();

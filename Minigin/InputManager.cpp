@@ -23,10 +23,10 @@ bool dae::InputManager::ProcessInput()
 	//ImGui_ImplSDL2_ProcessEvent(&e);
 
 	CheckBoundButtons();
-	return CheckBoundKeys();
+	return CheckBoundEvents();
 }
 
-bool dae::InputManager::CheckBoundKeys()
+bool dae::InputManager::CheckBoundEvents()
 {
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) 
@@ -35,26 +35,16 @@ bool dae::InputManager::CheckBoundKeys()
 		{
 			return false;
 		}
-		for (boundSDLKey& boundKey : m_BoundSDLKeys)
+		for (boundSDLEvent& boundEvent : m_BoundSDL_Events)
 		{
-			if (*boundKey.pKey.get() == e.key.keysym.sym)
+			SDL_Event* pEvent = boundEvent.pEvent.get();
+			if (pEvent->type == e.type && pEvent->key.keysym.sym == e.key.keysym.sym) //keyboard
 			{
-				switch (boundKey.buttonState)
-				{
-					case ButtonState::held:
-					case ButtonState::pressed:
-					{
-						if (e.type == SDL_KEYDOWN)
-							boundKey.pCommand->Execute(m_pControllerComponents[boundKey.playerIndex]->GetOwner(), nullptr);
-					}
-					break;
-					case ButtonState::released:
-					{
-						if (e.type == SDL_KEYUP)
-							boundKey.pCommand->Execute(m_pControllerComponents[boundKey.playerIndex]->GetOwner(), nullptr);
-					}
-					break;
-				}
+				boundEvent.pCommand->Execute(m_pControllerComponents[boundEvent.playerIndex]->GetOwner(), nullptr);
+			}
+			else if (pEvent->type == e.type && pEvent->button.button == e.button.button) //mouse
+			{
+				boundEvent.pCommand->Execute(m_pControllerComponents[boundEvent.playerIndex]->GetOwner(), nullptr);
 			}
 		}
 	}
