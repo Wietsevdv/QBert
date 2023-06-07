@@ -2,21 +2,12 @@
 #include "InputManager.h"
 #include "Components.h"
 #include "Services.h"
+#include "GameObject.h"
 
 #include <iostream>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "../3rdParty/imgui-1.89.4/backends/imgui_impl_sdl2.h"
-
-void dae::InputManager::AddController(ControllerComponent* pControllerComp)
-{
-	m_pControllerComponents.emplace_back(pControllerComp);
-}
-
-int dae::InputManager::GetNrOfControllers() const
-{ 
-	return static_cast<int>(m_pControllerComponents.size()); 
-}
 
 bool dae::InputManager::ProcessInput()
 {
@@ -40,13 +31,13 @@ bool dae::InputManager::CheckBoundEvents()
 			SDL_Event* pEvent = boundEvent.pEvent.get();
 			if (pEvent->type == e.type && pEvent->key.keysym.sym == e.key.keysym.sym) //keyboard
 			{
-				boundEvent.pCommand->Execute(m_pControllerComponents[boundEvent.playerIndex]->GetOwner(), nullptr);
+				boundEvent.pCommand->Execute(boundEvent.pGameObject, nullptr);
 			}
 			else if (pEvent->type == e.type && pEvent->button.button == e.button.button) //mouse
 			{
 				Sint32 mousePos[2]{ e.button.x, e.button.y };
 	
-				boundEvent.pCommand->Execute(m_pControllerComponents[boundEvent.playerIndex]->GetOwner(), mousePos);
+				boundEvent.pCommand->Execute(boundEvent.pGameObject, mousePos);
 			}
 		}
 	}
@@ -62,25 +53,25 @@ void dae::InputManager::CheckBoundButtons()
 		{
 			case ButtonState::pressed:
 			{
-				if (m_pControllerComponents[boundButton.controllerIndex]->GetController()->WentDownThisFrame(boundButton.button))
+				if (boundButton.pControllerComponent->GetController()->WentDownThisFrame(boundButton.button))
 				{
-					boundButton.pCommand->Execute(m_pControllerComponents[boundButton.controllerIndex]->GetOwner(), nullptr);
+					boundButton.pCommand->Execute(boundButton.pGameObject, nullptr);
 				}
 			}
 			break;
 			case ButtonState::released:
 			{
-				if (m_pControllerComponents[boundButton.controllerIndex]->GetController()->WentUpThisFrame(boundButton.button))
+				if (boundButton.pControllerComponent->GetController()->WentUpThisFrame(boundButton.button))
 				{
-					boundButton.pCommand->Execute(m_pControllerComponents[boundButton.controllerIndex]->GetOwner(), nullptr);
+					boundButton.pCommand->Execute(boundButton.pGameObject, nullptr);
 				}
 			}
 			break;
 			case ButtonState::held:
 			{
-				if (m_pControllerComponents[boundButton.controllerIndex]->GetController()->IsPressed(boundButton.button))
+				if (boundButton.pControllerComponent->GetController()->IsPressed(boundButton.button))
 				{
-					boundButton.pCommand->Execute(m_pControllerComponents[boundButton.controllerIndex]->GetOwner(), nullptr);
+					boundButton.pCommand->Execute(boundButton.pGameObject, nullptr);
 				}
 			}
 			break;

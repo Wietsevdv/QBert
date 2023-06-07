@@ -5,39 +5,39 @@
 
 #include <iostream>
 
-void dae::JumpRightUpCommand::Execute(GameObject* pPlayer, void* /*pData*/)
+void dae::JumpRightUpCommand::Execute(GameObject* pGameObject, void* /*pData*/)
 {
-	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
+	if (MovementComponent* pMovementComponent = pGameObject->GetComponent<MovementComponent>())
 	{
 		pMovementComponent->JumpRightUp();
 	}
 }
 
-void dae::JumpLeftUpCommand::Execute(GameObject* pPlayer, void* /*pData*/)
+void dae::JumpLeftUpCommand::Execute(GameObject* pGameObject, void* /*pData*/)
 {
-	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
+	if (MovementComponent* pMovementComponent = pGameObject->GetComponent<MovementComponent>())
 	{
 		pMovementComponent->JumpLeftUp();
 	}
 }
 
-void dae::JumpRightDownCommand::Execute(GameObject* pPlayer, void* /*pData*/)
+void dae::JumpRightDownCommand::Execute(GameObject* pGameObject, void* /*pData*/)
 {
-	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
+	if (MovementComponent* pMovementComponent = pGameObject->GetComponent<MovementComponent>())
 	{
 		pMovementComponent->JumpRightDown();
 	}
 }
 
-void dae::JumpLeftDownCommand::Execute(GameObject* pPlayer, void* /*pData*/)
+void dae::JumpLeftDownCommand::Execute(GameObject* pGameObject, void* /*pData*/)
 {
-	if (MovementComponent* pMovementComponent = dynamic_cast<MovementComponent*>(pPlayer->GetComponent<MovementComponent>()))
+	if (MovementComponent* pMovementComponent = pGameObject->GetComponent<MovementComponent>())
 	{
 		pMovementComponent->JumpLeftDown();
 	}
 }
 
-void dae::ChangeSceneCommand::Execute(GameObject* /*pPlayer*/, void* pData)
+void dae::ChangeSceneCommand::Execute(GameObject* /*pGameObject*/, void* pData)
 {
 	SceneManager::GetInstance().SetActiveScene("MainMenuScene");
 

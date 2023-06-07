@@ -186,7 +186,7 @@ dae::PlayerCollisionComponent::PlayerCollisionComponent(GameObject* pGameObject)
 		m_pTransformComponent = pGameObject->AddComponent<TransformComponent>(pGameObject);
 	else
 		m_pTransformComponent = pGameObject->GetComponent<TransformComponent>();
-};
+}
 
 void dae::PlayerCollisionComponent::HandleOverlap(GameObject* pOtherObject)
 {

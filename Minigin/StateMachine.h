@@ -5,10 +5,16 @@
 
 namespace dae
 {
+	class GameObject;
+
 	class BaseState
 	{
 	public:
-		BaseState() = default;
+		BaseState(GameObject* pGameObject)
+			: m_pGameObject{ pGameObject }
+		{
+		}
+
 		virtual ~BaseState() = default;
 		BaseState(const BaseState& other) = delete;
 		BaseState(BaseState&& other) = delete;
@@ -18,6 +24,9 @@ namespace dae
 		virtual void OnEnter() = 0;
 		virtual void Update(const float) = 0;
 		virtual void OnLeave() = 0;
+
+	private:
+		GameObject* m_pGameObject;
 	};
 
 	class BaseTransition
@@ -55,7 +64,7 @@ namespace dae
 		StateMachine operator=(const StateMachine& other) = delete;
 		StateMachine operator=(StateMachine&& other) = delete;
 
-		void AddState(std::shared_ptr<BaseState> pNewState) { m_States.emplace_back(pNewState); }
+		void AddState(std::shared_ptr<BaseState> pNewState, bool setActive = true);
 		void AddTransition(std::shared_ptr<BaseTransition> pNewTransition) { m_Transitions[pNewTransition->GetFrom()].emplace_back(pNewTransition); }
 
 		void Update(const float deltaT);

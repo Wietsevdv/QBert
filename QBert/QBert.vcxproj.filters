@@ -24,12 +24,18 @@
     <ClCompile Include="ProjectCommands.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ProjectStatesAndTransitions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ProjectComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ProjectCommands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectStatesAndTransitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

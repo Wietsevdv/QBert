@@ -138,8 +138,8 @@ namespace dae
 		PlayerCollisionComponent& operator=(const PlayerCollisionComponent& other) = delete;
 		PlayerCollisionComponent& operator=(PlayerCollisionComponent&& other) = delete;
 
-		virtual void Update(const float deltaT) override { CollisionComponent::Update(deltaT); } //DOES THIS WORK WITHOUT OVERWRITING???
-		virtual void LateUpdate(const float) override {};
+		//virtual void Update(const float deltaT) override { CollisionComponent::Update(deltaT); } //DOES THIS WORK WITHOUT OVERWRITING???
+		//virtual void LateUpdate(const float) override {};
 
 		void HandleOverlap(GameObject* pOtherObject);
 

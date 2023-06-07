@@ -60,9 +60,6 @@ namespace dae
 
 		bool m_IsDead = false;
 
-		//void SetLocalPosition(const glm::vec3 localPos);
-		//void SetLocalPosition(float x, float y, float z);
-
 		void SetPositionDirty() { m_pTransformComponent->SetPositionDirty(); }
 	};
 

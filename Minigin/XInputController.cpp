@@ -12,10 +12,10 @@
 class dae::XInputController::XInputControllerImpl
 {
 public:
-	XInputControllerImpl(ControllerComponent* pControllerComp)
-		: m_ControllerIdx{ static_cast<DWORD>(InputManager::GetInstance().GetNrOfControllers()) }
+	XInputControllerImpl()
+		: m_ControllerIdx{ m_NrOfControllers }
 	{
-		InputManager::GetInstance().AddController(pControllerComp);
+		++m_NrOfControllers;
 
 		ZeroMemory(&m_PreviousState, sizeof(m_PreviousState));
 		ZeroMemory(&m_CurrentState, sizeof(m_CurrentState));
@@ -30,6 +30,7 @@ public:
 	int GetIndex() const { return static_cast<int>(m_ControllerIdx); }
 
 private:
+	static DWORD m_NrOfControllers;
 	DWORD m_ControllerIdx;
 
 	XINPUT_STATE m_PreviousState{};
@@ -38,6 +39,8 @@ private:
 	WORD m_ButtonsPressedThisFrame{};
 	WORD m_ButtonsReleasedThisFrame{};
 };
+
+DWORD dae::XInputController::XInputControllerImpl::m_NrOfControllers = 0;
 
 void dae::XInputController::XInputControllerImpl::Update()
 {
@@ -80,8 +83,8 @@ bool dae::XInputController::XInputControllerImpl::IsPressed(ControllerButtons bu
 }
 
 //-----CONTROLLER-----
-dae::XInputController::XInputController(ControllerComponent* pControllerComp)
-	: m_pImpl{ new XInputControllerImpl(pControllerComp) }
+dae::XInputController::XInputController()
+	: m_pImpl{ new XInputControllerImpl() }
 {
 }
 

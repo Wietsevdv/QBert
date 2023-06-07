@@ -128,6 +128,8 @@ namespace dae
 
 		void SetTexture(const std::string& fileName);
 
+		glm::ivec2 GetTextureSize() const;
+
 	private:
 		std::shared_ptr<Texture2D> m_pTexture;
 
@@ -135,7 +137,7 @@ namespace dae
 		RenderComponent* m_pRenderComponent;
 	};
 
-	class TextComponent : public BaseComponent
+	class TextComponent final : public BaseComponent
 	{
 	public:
 		TextComponent(GameObject* pGameObject);
@@ -204,42 +206,17 @@ namespace dae
 		XInputController* GetController() const { return m_pController.get(); }
 
 	    template <class Command>
-		void BindButtonToCommand(ControllerButtons button, ButtonState state);
+		void BindButtonToCommand(GameObject* pGameObject, ControllerButtons button, ButtonState state);
 
 	private:
 		std::unique_ptr<XInputController> m_pController{};
 	};
 
 	template <class Command>
-	inline void ControllerComponent::BindButtonToCommand(ControllerButtons button, ButtonState state)
+	inline void ControllerComponent::BindButtonToCommand(GameObject* pGameObject, ControllerButtons button, ButtonState state)
 	{
-		InputManager::GetInstance().BindControllerButtonToCommand<Command>(GetController()->GetIndex(), button, state);
+		InputManager::GetInstance().BindControllerButtonToCommand<Command>(pGameObject, this, button, state);
 	}
-
-	class UIComponent final : public BaseComponent, public Observer
-	{
-	public:
-		UIComponent(GameObject* pGameObject)
-			: BaseComponent(pGameObject)
-		{
-		};
-
-		virtual ~UIComponent() {};
-		UIComponent(const UIComponent& other) = delete;
-		UIComponent(UIComponent&& other) = delete;
-		UIComponent& operator=(const UIComponent& other) = delete;
-		UIComponent& operator=(UIComponent&& other) = delete;
-
-		virtual void Update(const float) override {};
-		virtual void LateUpdate(const float) override {};
-
-		virtual void Notify(const GameObject& gameObject, GameEvents event) override;
-
-	private:
-		//keep pointers or reference to a texture and a text component. Give interface for setting a texture or a text which is then set on the rendercomponent.
-		//writing functionality in Notify would make the UIComponent unusable.
-		//instead make it a pure virtual base class. A project would inherit from this and add it's own functionality in its notify.
-	};
 
 	//default collision is a small cube at on top of gameObject
 	class CollisionComponent : public BaseComponent
@@ -269,6 +246,57 @@ namespace dae
 
 		std::function<void(GameObject* pOtherObject)> m_pCallbackFunction;
 
+		TransformComponent* m_pTransformComponent;
+	};
+
+	class UIComponent : public BaseComponent, public Observer
+	{
+	public:
+		UIComponent(GameObject* pGameObject);
+
+		virtual ~UIComponent() {};
+		UIComponent(const UIComponent& other) = delete;
+		UIComponent(UIComponent&& other) = delete;
+		UIComponent& operator=(const UIComponent& other) = delete;
+		UIComponent& operator=(UIComponent&& other) = delete;
+
+		virtual void Update(const float) override {};
+		virtual void LateUpdate(const float) override {};
+
+		virtual void SetTexture(const std::string& fileName);
+		void SetText(const std::string& text);
+
+		virtual void Notify(const GameObject& gameObject, GameEvents event) override;
+
+		const TextureComponent* GetTextureComponent() const { return m_pTextureComponent; }
+
+	private:
+		TextureComponent* m_pTextureComponent;
+		TextComponent* m_pTextComponent;
+	};
+
+	class MenuButtonComponent : public UIComponent
+	{
+	public:
+		MenuButtonComponent(GameObject* pGameObject);
+
+		virtual ~MenuButtonComponent() {};
+		MenuButtonComponent(const MenuButtonComponent& other) = delete;
+		MenuButtonComponent(MenuButtonComponent&& other) = delete;
+		MenuButtonComponent& operator=(const MenuButtonComponent& other) = delete;
+		MenuButtonComponent& operator=(MenuButtonComponent&& other) = delete;
+
+		virtual void Update(const float) override {};
+		virtual void LateUpdate(const float) override {};
+
+		virtual void SetTexture(const std::string& fileName) override;
+
+		virtual void Notify(const GameObject&, GameEvents) override {};
+
+		void Click(void* pData) const;
+
+	private:
+		glm::vec2 m_Points[4];
 		TransformComponent* m_pTransformComponent;
 	};
 }

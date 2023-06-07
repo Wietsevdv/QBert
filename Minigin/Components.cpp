@@ -97,6 +97,11 @@ void dae::TextureComponent::SetTexture(const std::string& fileName)
 		std::cout << "RenderComponent is nullptr\n";
 }
 
+glm::ivec2 dae::TextureComponent::GetTextureSize() const
+{
+	return m_pTexture->GetSize();
+}
+
 dae::TextComponent::TextComponent(GameObject* pGameObject)
 	: BaseComponent(pGameObject)
 	, m_NeedsUpdate(true)
@@ -195,21 +200,13 @@ void dae::FPSComponent::Update(const float deltaT)
 
 dae::ControllerComponent::ControllerComponent(GameObject* pGameObject)
 	: BaseComponent(pGameObject)
-	, m_pController{ std::make_unique<XInputController>(this) }
+	, m_pController{ std::make_unique<XInputController>() }
 {
 }
 
 void dae::ControllerComponent::Update(const float)
 {
 	m_pController->Update();
-}
-
-void dae::UIComponent::Notify(const GameObject& gameObject, GameEvents event)
-{
-	gameObject;
-	event;
-
-	std::cout << "\nUI component notified\n";
 }
 
 std::vector<dae::CollisionComponent*> dae::CollisionComponent::m_pAllCollisionComponents;
@@ -298,4 +295,94 @@ bool dae::CollisionComponent::IsOverlapping(const glm::vec2& leftBottom, const g
 
 	//projections on both axis overlap. This means the boxes overlap in the level.
 	return true;
+}
+
+dae::UIComponent::UIComponent(GameObject* pGameObject)
+	: BaseComponent{ pGameObject }
+	, m_pTextureComponent{ nullptr }
+	, m_pTextComponent{ nullptr }
+{
+}
+
+void dae::UIComponent::SetTexture(const std::string& fileName)
+{
+	if (m_pTextureComponent)
+		m_pTextureComponent->SetTexture(fileName);
+	else if (!m_pTextComponent)
+	{
+		if (!GetOwner()->IsComponentAdded<TextComponent>())
+			m_pTextureComponent = GetOwner()->AddComponent<TextureComponent>(GetOwner());
+		else
+			m_pTextureComponent = GetOwner()->GetComponent<TextureComponent>();
+
+		SetTexture(fileName);
+	}
+}
+
+void dae::UIComponent::SetText(const std::string& text)
+{
+	if (m_pTextComponent)
+		m_pTextComponent->SetText(text);
+	else if (!m_pTextureComponent)
+	{
+		if (!GetOwner()->IsComponentAdded<TextComponent>())
+			m_pTextComponent = GetOwner()->AddComponent<TextComponent>(GetOwner());
+		else
+			m_pTextComponent = GetOwner()->GetComponent<TextComponent>();
+
+		SetText(text);
+	}
+}
+
+void dae::UIComponent::Notify(const GameObject& gameObject, GameEvents event)
+{
+	gameObject;
+	event;
+
+	std::cout << "\nUI component notified\n";
+}
+
+dae::MenuButtonComponent::MenuButtonComponent(GameObject* pGameObject)
+	: UIComponent{ pGameObject }
+{
+	if (!GetOwner()->IsComponentAdded<TextComponent>())
+		m_pTransformComponent = GetOwner()->AddComponent<TransformComponent>(GetOwner());
+	else
+		m_pTransformComponent = GetOwner()->GetComponent<TransformComponent>();
+
+
+	const glm::vec3& worldPos = m_pTransformComponent->GetWorldPosition();
+	const glm::vec2 worldPos2D = { worldPos.x, worldPos.y };
+
+	m_Points[0] = worldPos2D + glm::vec2{ -100.f, 0.f };
+	m_Points[1] = worldPos2D + glm::vec2{ 100.f, 0.f };
+	m_Points[2] = worldPos2D + glm::vec2{ -100.f, -100.f };
+	m_Points[3] = worldPos2D + glm::vec2{ 100.f, -100.f };
+}
+
+void dae::MenuButtonComponent::SetTexture(const std::string& fileName)
+{
+	UIComponent::SetTexture(fileName);
+
+	glm::ivec2 textureSize = GetTextureComponent()->GetTextureSize();
+
+	const glm::vec3& worldPos = m_pTransformComponent->GetWorldPosition();
+	const glm::vec2 worldPos2D = { worldPos.x, worldPos.y };
+
+	m_Points[0] = worldPos2D + glm::vec2{ -textureSize.x / 2.f, 0.f };
+	m_Points[1] = worldPos2D + glm::vec2{ textureSize.x / 2.f, 0.f };
+	m_Points[2] = worldPos2D + glm::vec2{ -textureSize.x / 2.f, -textureSize.y };
+	m_Points[3] = worldPos2D + glm::vec2{ textureSize.x / 2.f, -textureSize.y };
+}
+
+void dae::MenuButtonComponent::Click(void* pData) const
+{
+	Sint32* pX = static_cast<Sint32*>(pData);
+	Sint32* pY = pX + 1;
+
+	if (*pX >= m_Points[0].x && *pX <= m_Points[1].x &&
+		*pY >= m_Points[2].y && *pY <= m_Points[0].y)
+	{
+		GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), PlayerDied);
+	}
 }

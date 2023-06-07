@@ -8,22 +8,13 @@ namespace dae
 	{
 	public:
 		virtual ~Command() = default;
-		virtual void Execute(GameObject* pPlayer, void* pData) = 0;
+		virtual void Execute(GameObject* pGameObject, void* pData) = 0;
 	};
 
-	class AddDirectionCommand final : public Command
+	class ClickCommand final : public Command
 	{
-		virtual void Execute(GameObject* pPlayer, void* pData) override;
+	public:
+		virtual ~ClickCommand() = default;
+		virtual void Execute(GameObject* pGameObject, void* pData) override;
 	};
-
-	class LoseLifePointCommand final : public Command
-	{
-		virtual void Execute(GameObject* pPlayer, void* pData) override;
-	};
-
-	class IncreaseScoreCommand final : public Command
-	{
-		virtual void Execute(GameObject* pPlayer, void* pData) override;
-	};
-
 }

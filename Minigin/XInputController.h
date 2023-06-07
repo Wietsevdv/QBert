@@ -21,7 +21,7 @@ namespace dae
 		class XInputControllerImpl;
 
 	public:
-		XInputController(ControllerComponent* pControllerComp);
+		XInputController();
 		~XInputController();
 
 		void Update();

@@ -10,9 +10,10 @@
 #include "Minigin.h"
 #include "SceneManager.h"
 #include "InputManager.h"
+#include "StateMachineManager.h"
 #include "Scene.h"
-//
 #include "GameObject.h"
+#include "StateMachine.h"
 #include "Services.h"
 
 #include "SDL_mixer.h"
@@ -22,6 +23,7 @@
 
 #include "ProjectComponents.h"
 #include "ProjectCommands.h"
+#include "ProjectStatesAndTransitions.h"
 
 using namespace dae;
 
@@ -38,7 +40,7 @@ void HandlePlayerOverlap222()
 void load()
 {
 	// First scene created and automatically the active one
-	auto& scene = SceneManager::GetInstance().CreateScene("StartScene");
+	auto& scene = SceneManager::GetInstance().CreateScene("MainGameScene");
 
 	//BLOCK TOP
 	std::shared_ptr<GameObject> blockGO = std::make_shared<GameObject>();
@@ -137,10 +139,10 @@ void load()
 	pPlayerCollisionComponent->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
 	
 	ControllerComponent* pQBertControllerComponent = go->AddComponent<ControllerComponent>(go.get());
-	pQBertControllerComponent->BindButtonToCommand<JumpRightUpCommand>(ControllerButtons::DRight, ButtonState::pressed);
-	pQBertControllerComponent->BindButtonToCommand<JumpLeftUpCommand>(ControllerButtons::DUp, ButtonState::pressed);
-	pQBertControllerComponent->BindButtonToCommand<JumpRightDownCommand>(ControllerButtons::DDown, ButtonState::pressed);
-	pQBertControllerComponent->BindButtonToCommand<JumpLeftDownCommand>(ControllerButtons::DLeft, ButtonState::pressed);
+	pQBertControllerComponent->BindButtonToCommand<JumpRightUpCommand>(go.get(), ControllerButtons::DRight, ButtonState::pressed);
+	pQBertControllerComponent->BindButtonToCommand<JumpLeftUpCommand>(go.get(), ControllerButtons::DUp, ButtonState::pressed);
+	pQBertControllerComponent->BindButtonToCommand<JumpRightDownCommand>(go.get(), ControllerButtons::DDown, ButtonState::pressed);
+	pQBertControllerComponent->BindButtonToCommand<JumpLeftDownCommand>(go.get(), ControllerButtons::DLeft, ButtonState::pressed);
 
 	scene.Add(go);
 
@@ -158,19 +160,28 @@ void load()
 	std::cout << "\n\nPress 'v' to play a sound\n";
 
 	//-----------------------MAIN MENU SCENE--------------------------------
-	auto& mainMenuScene = SceneManager::GetInstance().CreateScene("MainMenuScene", false);
+	auto& mainMenuScene = SceneManager::GetInstance().CreateScene("StartMenuScene");
 
-	auto blockie = std::make_shared<GameObject>();
-	blockie->AddComponent<TransformComponent>(blockie.get())->SetLocalPosition(100.f, 100.f, 0.f);
-	blockie->AddComponent<TextureComponent>(blockie.get())->SetTexture("Block_Blue_1.png");
+	auto playButton = std::make_shared<GameObject>();
+	playButton->MakeSubject();
+	playButton->AddComponent<TransformComponent>(playButton.get())->SetLocalPosition(320.f, 230.f, 0.f);
+	playButton->AddComponent<MenuButtonComponent>(playButton.get())->SetTexture("Play.png");
 
-	mainMenuScene.Add(blockie);
+	mainMenuScene.Add(playButton);
 
-	std::shared_ptr<SDL_Event> pChangeMenuEvent = std::make_shared<SDL_Event>();
-	pChangeMenuEvent->type = SDL_MOUSEBUTTONDOWN;
-	pChangeMenuEvent->button.button = SDL_BUTTON_LEFT;
+	//---------------------GAMESTATE MACHINE--------------------------------
+	StateMachine* gameStateMachine = StateMachineManager::GetInstance().CreateStateMachine();
+	std::shared_ptr<StartMenuState> smState = std::make_shared<StartMenuState>(playButton.get());
+	std::shared_ptr<MainGameState> mgState = std::make_shared<MainGameState>(nullptr);
+	gameStateMachine->AddState(smState);
+	gameStateMachine->AddState(mgState, false);
+	gameStateMachine->AddTransition(std::make_shared<StartGameTransition>(smState.get(), mgState.get()));
 
-	InputManager::GetInstance().BindSDLEventToCommand<ChangeSceneCommand>(0, pChangeMenuEvent);
+	std::shared_ptr<SDL_Event> pPlayClickedEvent = std::make_shared<SDL_Event>();
+	pPlayClickedEvent->type = SDL_MOUSEBUTTONDOWN;
+	pPlayClickedEvent->button.button = SDL_BUTTON_LEFT;
+
+	InputManager::GetInstance().BindSDLEventToCommand<ClickCommand>(playButton.get(), pPlayClickedEvent);
 }
 
 int main(int, char* []) {
