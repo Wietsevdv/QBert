@@ -87,8 +87,13 @@ dae::TextureComponent::TextureComponent(GameObject* pGameObject)
 
 void dae::TextureComponent::SetTexture(const std::string& fileName)
 {
-	m_pTexture = ResourceManager::GetInstance().LoadTexture(fileName);
-	
+	SetTexture(ResourceManager::GetInstance().LoadTexture(fileName));
+}
+
+void dae::TextureComponent::SetTexture(std::shared_ptr<Texture2D> pTexture)
+{
+	m_pTexture = pTexture;
+
 	if (m_pRenderComponent)
 	{
 		m_pRenderComponent->SetTexture(m_pTexture);

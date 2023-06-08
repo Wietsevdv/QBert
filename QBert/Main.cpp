@@ -27,101 +27,44 @@
 
 using namespace dae;
 
-void HandlePlayerOverlap()
-{
-	std::cout << "\n\nOMG I OVERLAPPED SOMETHING!!!\n\n";
-}
-
-void HandlePlayerOverlap222()
-{
-	std::cout << "\n\nOMG I OVERLAPPED SOMETHING!!!\n\n";
-}
+void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState);
 
 void load()
 {
 	// First scene created and automatically the active one
 	auto& scene = SceneManager::GetInstance().CreateScene("MainGameScene");
 
-	//BLOCK TOP
-	std::shared_ptr<GameObject> blockGO = std::make_shared<GameObject>();
-	TextureComponent* pBlockTexture = blockGO->AddComponent<TextureComponent>(blockGO.get());
-	pBlockTexture->SetTexture("Block_Blue_1.png");
+	//-----------------------MAIN MENU SCENE--------------------------------
+	auto& mainMenuScene = SceneManager::GetInstance().CreateScene("StartMenuScene");
 
-	TransformComponent* pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(320.f, 200.f, 0.f);
+	auto playButton = std::make_shared<GameObject>();
+	playButton->MakeSubject();
+	playButton->AddComponent<TransformComponent>(playButton.get())->SetLocalPosition(320.f, 230.f, 0.f);
+	playButton->AddComponent<MenuButtonComponent>(playButton.get())->SetTexture("UI/Play.png");
 
-	CubeComponent* pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
-	pCubeComponent->SetIsRightEdgeCube();
-	pCubeComponent->SetIsLeftEdgeCube();
+	mainMenuScene.Add(playButton);
 
-	//collisionComp
-	CollisionComponent* pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
+	//---------------------GAMESTATE MACHINE--------------------------------
+	StateMachine* gameStateMachine = StateMachineManager::GetInstance().CreateStateMachine();
+	std::shared_ptr<StartMenuState> smState = std::make_shared<StartMenuState>(playButton.get());
+	std::shared_ptr<MainGameState> mgState = std::make_shared<MainGameState>(nullptr);
+	gameStateMachine->AddState(smState);
+	gameStateMachine->AddState(mgState, false);
+	gameStateMachine->AddTransition(std::make_shared<StartGameTransition>(smState.get(), mgState.get()));
 
-	glm::vec2 bottomLeft{ -4.f, -24.f };
-	glm::vec2 bottomRight{ 4.f, -24.f };
-	glm::vec2 topLeft{ -4.f, -26.f };
-	glm::vec2 topRight{ 4.f, -26.f };
+	std::shared_ptr<SDL_Event> pPlayClickedEvent = std::make_shared<SDL_Event>();
+	pPlayClickedEvent->type = SDL_MOUSEBUTTONDOWN;
+	pPlayClickedEvent->button.button = SDL_BUTTON_LEFT;
 
-	pCollisionComp->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
+	InputManager::GetInstance().BindSDLEventToCommand<ClickCommand>(playButton.get(), pPlayClickedEvent);
 
-	scene.Add(blockGO);
-
-	//BLOCK RIGHT
-	blockGO = std::make_shared<GameObject>();
-	pBlockTexture = blockGO->AddComponent<TextureComponent>(blockGO.get());
-	pBlockTexture->SetTexture("Block_Blue_1.png");
-
-	pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(336.f, 224.f, 0.f);
-
-	pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
-	pCubeComponent->SetIsRightEdgeCube();
-
-	//collisionComp
-	pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
-	pCollisionComp->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
-
-	scene.Add(blockGO);
-
-	//BLOCK LEFT
-	blockGO = std::make_shared<GameObject>();
-	pBlockTexture = blockGO->AddComponent<TextureComponent>(blockGO.get());
-	pBlockTexture->SetTexture("Block_Blue_1.png");
-
-	pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(304.f, 224.f, 0.f);
-
-	pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
-	pCubeComponent->SetIsLeftEdgeCube();
-
-	//collisionComp
-	pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
-	pCollisionComp->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
-
-	scene.Add(blockGO);
-
-	//BLOCK BOTTOM
-	blockGO = std::make_shared<GameObject>();
-	pBlockTexture = blockGO->AddComponent<TextureComponent>(blockGO.get());
-	pBlockTexture->SetTexture("Block_Blue_1.png");
-
-	pBlockTransformComp = blockGO->GetComponent<TransformComponent>();
-	pBlockTransformComp->SetLocalPosition(320.f, 248.f, 0.f);
-
-	pCubeComponent = blockGO->AddComponent<CubeComponent>(blockGO.get());
-	pCubeComponent->SetIsBottomEdgeCube();
-
-	//collisionComp
-	pCollisionComp = blockGO->AddComponent<CollisionComponent>(blockGO.get());
-	pCollisionComp->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
-
-	scene.Add(blockGO);
+	LoadCubes(scene, mgState.get());
 
 	//Q-BERT
 	std::shared_ptr<GameObject> go = std::make_shared<GameObject>();
 
 	TextureComponent* pTexture = go->AddComponent<TextureComponent>(go.get());
-	pTexture->SetTexture("Q-BertLeftDownStand.png");
+	pTexture->SetTexture("Q-Bert/Q-BertLeftDownStand.png");
 
 	UIComponent* pUIcomp = go->AddComponent<UIComponent>(go.get());
 
@@ -132,10 +75,10 @@ void load()
 	go->AddComponent<PlayerComponent>(go.get());
 
 	PlayerCollisionComponent* pPlayerCollisionComponent = go->AddComponent<PlayerCollisionComponent>(go.get());
-	bottomLeft = { -3.f, 0.f };
-	bottomRight = { 3.f, 0.f };
-	topLeft = { -3.f, -5.f };
-	topRight = { 3.f, -5.f };
+	glm::vec2 bottomLeft = { -3.f, 0.f };
+	glm::vec2 bottomRight = { 3.f, 0.f };
+	glm::vec2 topLeft = { -3.f, -5.f };
+	glm::vec2 topRight = { 3.f, -5.f };
 	pPlayerCollisionComponent->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
 	
 	ControllerComponent* pQBertControllerComponent = go->AddComponent<ControllerComponent>(go.get());
@@ -154,34 +97,68 @@ void load()
 	dae::ServiceLocator::RegisterSoundSystem(new dae::SDL_SoundSystem());
 	dae::SoundSystem* pSS = dae::ServiceLocator::GetSoundSystem();
 	
-	pSS->Load(0, "fall.mp3", 16);
-	pSS->Load(1, "jump.wav", 16);
+	pSS->Load(0, "Sounds/fall.mp3", 16);
+	pSS->Load(1, "Sounds/jump.wav", 16);
 
 	std::cout << "\n\nPress 'v' to play a sound\n";
+}
 
-	//-----------------------MAIN MENU SCENE--------------------------------
-	auto& mainMenuScene = SceneManager::GetInstance().CreateScene("StartMenuScene");
+void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState)
+{
+	const std::string blockName{ "Cubes/Cube_Blue_1.png" };
+	glm::vec3 position{ 320.f, 200.f, 0.f };
 
-	auto playButton = std::make_shared<GameObject>();
-	playButton->MakeSubject();
-	playButton->AddComponent<TransformComponent>(playButton.get())->SetLocalPosition(320.f, 230.f, 0.f);
-	playButton->AddComponent<MenuButtonComponent>(playButton.get())->SetTexture("Play.png");
+	glm::vec2 bottomLeft{ -4.f, -24.f };
+	glm::vec2 bottomRight{ 4.f, -24.f };
+	glm::vec2 topLeft{ -4.f, -26.f };
+	glm::vec2 topRight{ 4.f, -26.f };
 
-	mainMenuScene.Add(playButton);
+	glm::ivec2 textureSize{};
 
-	//---------------------GAMESTATE MACHINE--------------------------------
-	StateMachine* gameStateMachine = StateMachineManager::GetInstance().CreateStateMachine();
-	std::shared_ptr<StartMenuState> smState = std::make_shared<StartMenuState>(playButton.get());
-	std::shared_ptr<MainGameState> mgState = std::make_shared<MainGameState>(nullptr);
-	gameStateMachine->AddState(smState);
-	gameStateMachine->AddState(mgState, false);
-	gameStateMachine->AddTransition(std::make_shared<StartGameTransition>(smState.get(), mgState.get()));
+	std::shared_ptr<dae::Texture2D> pNormalTexture = ResourceManager::GetInstance().LoadTexture("Cubes/Cube_Blue_1.png");
+	std::shared_ptr<dae::Texture2D> pIntermediateTexture = ResourceManager::GetInstance().LoadTexture("Cubes/Cube_Green_1.png");
+	std::shared_ptr<dae::Texture2D> pGoalTexture = ResourceManager::GetInstance().LoadTexture("Cubes/Cube_Yellow_1.png");
 
-	std::shared_ptr<SDL_Event> pPlayClickedEvent = std::make_shared<SDL_Event>();
-	pPlayClickedEvent->type = SDL_MOUSEBUTTONDOWN;
-	pPlayClickedEvent->button.button = SDL_BUTTON_LEFT;
+	for (int i{ 1 }; i < 8; ++i)
+	{
+		for (int j{}; j < i; ++j)
+		{
+			std::shared_ptr<GameObject> pCube = std::make_shared<GameObject>();
+			pCube->MakeSubject();
 
-	InputManager::GetInstance().BindSDLEventToCommand<ClickCommand>(playButton.get(), pPlayClickedEvent);
+			TextureComponent* pTextureComponent = pCube->AddComponent<TextureComponent>(pCube.get());
+			pTextureComponent->SetTexture(blockName);
+			textureSize = pTextureComponent->GetTextureSize();
+
+			pCube->GetComponent<TransformComponent>()->SetLocalPosition(position);
+			pCube->AddComponent<CollisionComponent>(pCube.get())->SetPoints(bottomLeft, bottomRight, topLeft, topRight);
+
+			CubeComponent* pCubeComponent = pCube->AddComponent<CubeComponent>(pCube.get());
+			pCubeComponent->SetCubeType(dae::CubeComponent::CubeType::SwitchBack);
+			pCubeComponent->SetNormalTexture(pNormalTexture);
+			pCubeComponent->SetIntermediateTexture(pIntermediateTexture);
+			pCubeComponent->SetGoalTexture(pGoalTexture);
+
+			pMainGameState->AddCube(pCubeComponent);
+
+			if (j == 0)
+				pCubeComponent->SetIsLeftEdgeCube();
+			if (!(j + 1 < i))
+				pCubeComponent->SetIsRightEdgeCube();
+			if (i == 7)
+				pCubeComponent->SetIsBottomEdgeCube();
+
+			scene.Add(pCube);
+
+			if (i == 1)
+				position.x -= textureSize.x * 0.5f;
+			else if (!(j + 1 < i))
+				position.x -= textureSize.x * (j + 0.5f);
+			else
+				position.x += textureSize.x;
+		}
+		position.y += textureSize.y * 0.75f;
+	}
 }
 
 int main(int, char* []) {

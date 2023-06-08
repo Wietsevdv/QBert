@@ -3,11 +3,84 @@
 #include "Services.h"
 #include <iostream>
 
+dae::CubeComponent::CubeComponent(GameObject* pGameObject)
+	: BaseComponent{ pGameObject }
+	, m_CubeType{ CubeType::Normal }
+	, m_CubeState{ CubeState::Normal }
+	, m_pNormalTexture{ nullptr }
+	, m_pIntermediateTexture{ nullptr }
+	, m_pGoalTexture{ nullptr }
+	, m_IsBottomEdgeCube{ false }
+	, m_IsRightEdgeCube{ false }
+	, m_IsLeftEdgeCube{ false }
+{
+	if (!pGameObject->IsComponentAdded<TextureComponent>())
+		m_pTextureComponent = pGameObject->AddComponent<TextureComponent>(pGameObject);
+	else
+		m_pTextureComponent = pGameObject->GetComponent<TextureComponent>();
+}
+
+void dae::CubeComponent::Hit(GameObject* pGameObject)
+{
+	switch (m_CubeState)
+	{
+		case CubeState::Normal:
+		{
+			if (pGameObject->IsComponentAdded<PlayerComponent>())
+			{
+				if (m_CubeType == CubeType::Normal || m_CubeType == CubeType::SwitchBack)
+				{
+					m_pTextureComponent->SetTexture(m_pGoalTexture);
+					m_CubeState = CubeState::Completed;
+
+					GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), GameEvents::PlayerDied);
+				}
+				else
+				{
+					m_pTextureComponent->SetTexture(m_pIntermediateTexture);
+					m_CubeState = CubeState::Intermediate;
+				}
+			}
+		}
+		break;
+		case CubeState::Intermediate:
+		{
+			//change color immediately if hit by player. Intermediate state can only be achieved when the cube is that type so no need to check
+			if (pGameObject->IsComponentAdded<PlayerComponent>())
+			{
+				m_pTextureComponent->SetTexture(m_pGoalTexture);
+				m_CubeState = CubeState::Completed;
+
+				GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), GameEvents::PlayerDied);
+			}
+		}
+		break;
+		case CubeState::Completed:
+		{
+			if (m_CubeType == CubeType::Normal || m_CubeType == CubeType::Intermediate)
+				return;
+			//switchback
+			if (pGameObject->IsComponentAdded<PlayerComponent>())
+			{
+				m_pTextureComponent->SetTexture(m_pNormalTexture);
+				m_CubeState = CubeState::Normal;
+
+				GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), GameEvents::PlayerDied);
+			}
+		}
+		break;
+	}
+}
+
 dae::MovementComponent::MovementComponent(GameObject* pGameObject)
 	: BaseComponent(pGameObject)
 	, m_Velocity{ glm::vec3{0.f, 0.f, 0.f} }
 	, m_pCubeComponentLanded { nullptr }
 	, m_IsFallingToDeath{ false }
+	, m_JumpRightUp{ "Q-Bert/Q-BertRightUpJump.png" }
+	, m_JumpLeftUp{ "Q-Bert/Q-BertLeftUpJump.png" }
+	, m_JumpRightDown{ "Q-Bert/Q-BertRightDownJump.png" }
+	, m_JumpLeftDown{ "Q-Bert/Q-BertLeftDownJump.png" }
 {
 	if (!pGameObject->IsComponentAdded<TransformComponent>())
 		m_pTransformComponent = pGameObject->AddComponent<TransformComponent>(pGameObject);
@@ -44,6 +117,7 @@ void dae::MovementComponent::Land(CubeComponent* pCubeComponent)
 		return;
 
 	m_pCubeComponentLanded = pCubeComponent;
+	pCubeComponent->Hit(GetOwner());
 
 	dae::SoundSystem* pSS = dae::ServiceLocator::GetSoundSystem();
 	pSS->Play(1);
@@ -60,7 +134,7 @@ void dae::MovementComponent::JumpRightUp()
 
 		m_Velocity += glm::vec3{ 40.f, -340.f, 0.f };
 
-		m_pTextureComponent->SetTexture("Q-BertRightUpJump.png");
+		m_pTextureComponent->SetTexture(m_JumpRightUp);
 
 		if (m_pCubeComponentLanded->IsRightEdgeCube())
 		{
@@ -76,7 +150,7 @@ void dae::MovementComponent::JumpLeftUp()
 	{
 		m_Velocity += glm::vec3{ -40.f, -340.f, 0.f };
 
-		m_pTextureComponent->SetTexture("Q-BertLeftUpJump.png");
+		m_pTextureComponent->SetTexture(m_JumpLeftUp);
 
 		if (m_pCubeComponentLanded->IsLeftEdgeCube())
 		{
@@ -93,7 +167,7 @@ void dae::MovementComponent::JumpRightDown()
 	{
 		m_Velocity += glm::vec3{ 40.f, -230.f, 0.f };
 
-		m_pTextureComponent->SetTexture("Q-BertRightDownJump.png");
+		m_pTextureComponent->SetTexture(m_JumpRightDown);
 
 		if (m_pCubeComponentLanded->IsBottomEdgeCube())
 			FallOff();
@@ -106,7 +180,7 @@ void dae::MovementComponent::JumpLeftDown()
 	{
 		m_Velocity += glm::vec3{ -40.f, -230.f, 0.f };
 
-		m_pTextureComponent->SetTexture("Q-BertLeftDownJump.png");
+		m_pTextureComponent->SetTexture(m_JumpLeftDown);
 
 		if (m_pCubeComponentLanded->IsBottomEdgeCube())
 			FallOff();

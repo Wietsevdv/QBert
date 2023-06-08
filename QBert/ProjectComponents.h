@@ -6,13 +6,21 @@ namespace dae
 	class CubeComponent final : public BaseComponent
 	{
 	public:
-		CubeComponent(GameObject* pGameObject)
-			: BaseComponent{ pGameObject }
-			, m_IsBottomEdgeCube{ false }
-			, m_IsRightEdgeCube{ false }
-			, m_IsLeftEdgeCube{ false }
+		enum class CubeType
 		{
+			Normal,
+			Intermediate,
+			SwitchBack
 		};
+
+		enum class CubeState
+		{
+			Normal,
+			Intermediate,
+			Completed
+		};
+
+		CubeComponent(GameObject* pGameObject);
 
 		virtual ~CubeComponent() {};
 		CubeComponent(const CubeComponent& other) = delete;
@@ -23,6 +31,14 @@ namespace dae
 		virtual void Update(const float) override {};
 		virtual void LateUpdate(const float) override {};
 
+		CubeState GetCubeState() const { return m_CubeState; }
+		void SetCubeType(CubeType type) { m_CubeType = type; }
+		void SetNormalTexture(std::shared_ptr<Texture2D> pNormalTexture) { m_pNormalTexture = pNormalTexture; }
+		void SetIntermediateTexture(std::shared_ptr<Texture2D> pIntermediateTexture) { m_pIntermediateTexture = pIntermediateTexture; }
+		void SetGoalTexture(std::shared_ptr<Texture2D> pGoalTexture) { m_pGoalTexture = pGoalTexture; }
+
+		void Hit(GameObject* pGameObject);
+
 		void SetIsBottomEdgeCube() { m_IsBottomEdgeCube = true; }
 		void SetIsRightEdgeCube() { m_IsRightEdgeCube = true; }
 		void SetIsLeftEdgeCube() { m_IsLeftEdgeCube = true; }
@@ -32,9 +48,18 @@ namespace dae
 		bool IsLeftEdgeCube() const { return m_IsLeftEdgeCube; }
 
 	private:
+		CubeType m_CubeType;
+		CubeState m_CubeState;
+
+		std::shared_ptr<Texture2D> m_pNormalTexture;
+		std::shared_ptr<Texture2D> m_pIntermediateTexture;
+		std::shared_ptr<Texture2D> m_pGoalTexture;
+
 		bool m_IsBottomEdgeCube;
 		bool m_IsRightEdgeCube;
 		bool m_IsLeftEdgeCube;
+
+		TextureComponent* m_pTextureComponent;
 	};
 
 	class MovementComponent final : public BaseComponent
@@ -75,6 +100,11 @@ namespace dae
 		CubeComponent* m_pCubeComponentLanded;
 		TextureComponent* m_pTextureComponent;
 		RenderComponent* m_pRenderComponent;
+
+		const std::string m_JumpRightUp;
+		const std::string m_JumpLeftUp;
+		const std::string m_JumpRightDown;
+		const std::string m_JumpLeftDown;
 	};
 
 	class GravityComponent final : public BaseComponent

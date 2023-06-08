@@ -127,6 +127,7 @@ namespace dae
 		virtual void LateUpdate(const float) override {};
 
 		void SetTexture(const std::string& fileName);
+		void SetTexture(std::shared_ptr<Texture2D> pTexture);
 
 		glm::ivec2 GetTextureSize() const;
 

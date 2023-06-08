@@ -5,6 +5,8 @@
 
 namespace dae
 {
+	class CubeComponent;
+
 	class StartMenuState final : public BaseState, public Observer
 	{
 	public:
@@ -44,6 +46,11 @@ namespace dae
 		virtual void OnLeave() {};
 
 		virtual void Notify(const GameObject& gameObject, GameEvents event) override;
+
+		void AddCube(CubeComponent* pCube);
+
+	private:
+		std::map<CubeComponent*, bool> m_CubeCompletions{};
 	};
 
 	class StartGameTransition final : public BaseTransition
