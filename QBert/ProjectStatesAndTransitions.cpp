@@ -60,11 +60,6 @@ void dae::MainGameState::AddCube(CubeComponent* pCube)
 	m_CubeCompletions[pCube] = false;
 }
 
-dae::StartGameTransition::StartGameTransition(BaseState* pFrom, BaseState* pTo)
-	: BaseTransition{ pFrom, pTo }
-{
-}
-
 bool dae::StartGameTransition::Check(const float)
 {
 	if (GetFrom())
@@ -75,5 +70,20 @@ bool dae::StartGameTransition::Check(const float)
 				return true;
 		}
 	}
+	return false;
+}
+
+bool dae::LoadSoloGameTransition::Check(const float)
+{
+	return false;
+}
+
+bool dae::LoadCoopGameTransition::Check(const float)
+{
+	return false;
+}
+
+bool dae::LoadVSGameTransition::Check(const float)
+{
 	return false;
 }

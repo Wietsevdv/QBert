@@ -92,6 +92,7 @@ namespace dae
 	private:
 		glm::vec3 m_Velocity;
 		bool m_IsFallingToDeath;
+		bool m_DontTriggerLandHit;
 
 		void FallOff();
 

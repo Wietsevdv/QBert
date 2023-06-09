@@ -77,6 +77,7 @@ dae::MovementComponent::MovementComponent(GameObject* pGameObject)
 	, m_Velocity{ glm::vec3{0.f, 0.f, 0.f} }
 	, m_pCubeComponentLanded { nullptr }
 	, m_IsFallingToDeath{ false }
+	, m_DontTriggerLandHit{ true }
 	, m_JumpRightUp{ "Q-Bert/Q-BertRightUpJump.png" }
 	, m_JumpLeftUp{ "Q-Bert/Q-BertLeftUpJump.png" }
 	, m_JumpRightDown{ "Q-Bert/Q-BertRightDownJump.png" }
@@ -113,14 +114,16 @@ void dae::MovementComponent::Land(CubeComponent* pCubeComponent)
 {
 	m_Velocity = glm::vec3{ 0.f, 0.f, 0.f };
 
-	if (m_pCubeComponentLanded == pCubeComponent)
-		return;
+	if (m_pCubeComponentLanded != pCubeComponent)
+	{
+		m_pCubeComponentLanded = pCubeComponent;
+		if (m_DontTriggerLandHit)
+			return;
+		pCubeComponent->Hit(GetOwner());
 
-	m_pCubeComponentLanded = pCubeComponent;
-	pCubeComponent->Hit(GetOwner());
-
-	dae::SoundSystem* pSS = dae::ServiceLocator::GetSoundSystem();
-	pSS->Play(1);
+		dae::SoundSystem* pSS = dae::ServiceLocator::GetSoundSystem();
+		pSS->Play(1);
+	}
 
 	//Add logic to change the texture into the correct standing texture
 }
@@ -129,8 +132,7 @@ void dae::MovementComponent::JumpRightUp()
 {
 	if (m_Velocity.y == 0.f)
 	{
-		//Maybe attach the gameObject as a child to the block he lands on. That way you can access the block through GetParent().
-		//Remove as child after jumping ofcourse
+		m_DontTriggerLandHit = false;
 
 		m_Velocity += glm::vec3{ 40.f, -340.f, 0.f };
 
@@ -148,6 +150,8 @@ void dae::MovementComponent::JumpLeftUp()
 {
 	if (m_Velocity.y == 0.f)
 	{
+		m_DontTriggerLandHit = false;
+
 		m_Velocity += glm::vec3{ -40.f, -340.f, 0.f };
 
 		m_pTextureComponent->SetTexture(m_JumpLeftUp);
@@ -165,6 +169,8 @@ void dae::MovementComponent::JumpRightDown()
 {
 	if (m_Velocity.y == 0.f)
 	{
+		m_DontTriggerLandHit = false;
+
 		m_Velocity += glm::vec3{ 40.f, -230.f, 0.f };
 
 		m_pTextureComponent->SetTexture(m_JumpRightDown);
@@ -178,6 +184,8 @@ void dae::MovementComponent::JumpLeftDown()
 {
 	if (m_Velocity.y == 0.f)
 	{
+		m_DontTriggerLandHit = false;
+
 		m_Velocity += glm::vec3{ -40.f, -230.f, 0.f };
 
 		m_pTextureComponent->SetTexture(m_JumpLeftDown);

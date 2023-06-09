@@ -40,7 +40,7 @@ void load()
 	auto playButton = std::make_shared<GameObject>();
 	playButton->MakeSubject();
 	playButton->AddComponent<TransformComponent>(playButton.get())->SetLocalPosition(320.f, 230.f, 0.f);
-	playButton->AddComponent<MenuButtonComponent>(playButton.get())->SetTexture("UI/Play.png");
+	playButton->AddComponent<MenuButtonComponent>(playButton.get())->SetTexture("UI/Solo.png");
 
 	mainMenuScene.Add(playButton);
 
@@ -123,6 +123,7 @@ void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState)
 	{
 		for (int j{}; j < i; ++j)
 		{
+			//load cube
 			std::shared_ptr<GameObject> pCube = std::make_shared<GameObject>();
 			pCube->MakeSubject();
 
@@ -150,6 +151,7 @@ void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState)
 
 			scene.Add(pCube);
 
+			//move position for next cube
 			if (i == 1)
 				position.x -= textureSize.x * 0.5f;
 			else if (!(j + 1 < i))
