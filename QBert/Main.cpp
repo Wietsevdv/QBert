@@ -25,12 +25,18 @@
 #include "ProjectCommands.h"
 #include "ProjectStatesAndTransitions.h"
 
+#include "BinaryFileWriter.h"
+
 using namespace dae;
 
 void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState);
 
+void WriteBinaryFile();
+
 void load()
 {
+	WriteBinaryFile();
+
 	// First scene created and automatically the active one
 	auto& scene = SceneManager::GetInstance().CreateScene("MainGameScene");
 
@@ -99,8 +105,6 @@ void load()
 	
 	pSS->Load(0, "Sounds/fall.mp3", 16);
 	pSS->Load(1, "Sounds/jump.wav", 16);
-
-	std::cout << "\n\nPress 'v' to play a sound\n";
 }
 
 void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState)
@@ -136,9 +140,9 @@ void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState)
 
 			CubeComponent* pCubeComponent = pCube->AddComponent<CubeComponent>(pCube.get());
 			pCubeComponent->SetCubeType(dae::CubeComponent::CubeType::SwitchBack);
-			pCubeComponent->SetNormalTexture(pNormalTexture);
-			pCubeComponent->SetIntermediateTexture(pIntermediateTexture);
-			pCubeComponent->SetGoalTexture(pGoalTexture);
+			pCubeComponent->SetFirstTexture(pNormalTexture);
+			pCubeComponent->SetSecondTexture(pIntermediateTexture);
+			pCubeComponent->SetThirdTexture(pGoalTexture);
 
 			pMainGameState->AddCube(pCubeComponent);
 
@@ -161,6 +165,29 @@ void LoadCubes(dae::Scene& scene, MainGameState* pMainGameState)
 		}
 		position.y += textureSize.y * 0.75f;
 	}
+}
+
+void WriteBinaryFile()
+{
+	BinaryFileWriter soloLevel01{ "Level01Solo" };
+	//---BLOCK 1---
+	char nrOfPlayers{ 1 };
+	soloLevel01.Write(&nrOfPlayers, sizeof(char));
+
+	float pos[2]{ 320.f, 50.f };
+	soloLevel01.Write(reinterpret_cast<char*>(&pos), sizeof(pos));
+
+	//---BLOCK 2---
+	CubeComponent::CubeType cubeType = CubeComponent::CubeType::Normal;
+	soloLevel01.Write(reinterpret_cast<char*>(cubeType), sizeof(cubeType));
+
+	//round 1
+	
+	//round 2
+	
+	//round 3
+	
+	//round 4
 }
 
 int main(int, char* []) {

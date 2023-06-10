@@ -220,6 +220,7 @@
     <ClInclude Include="..\3rdParty\imgui-1.89.4\imstb_truetype.h" />
     <ClInclude Include="..\3rdParty\imgui-1.89.4\include\imgui_plot.h" />
     <ClInclude Include="BinaryFileReader.h" />
+    <ClInclude Include="BinaryFileWriter.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="Font.h" />
@@ -249,6 +250,7 @@
     <ClCompile Include="..\3rdParty\imgui-1.89.4\imgui_widgets.cpp" />
     <ClCompile Include="..\3rdParty\imgui-1.89.4\src\imgui_plot.cpp" />
     <ClCompile Include="BinaryFileReader.cpp" />
+    <ClCompile Include="BinaryFileWriter.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Components.cpp" />
     <ClCompile Include="Font.cpp" />

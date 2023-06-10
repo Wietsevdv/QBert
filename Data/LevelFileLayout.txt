@@ -1,0 +1,21 @@
+FIRST BLOCK:
+	1st byte: nr of players
+
+	4 bytes for a float. 2 floats for position (x&y)
+	So read the next (max 16) bytes as floats (per 4)
+
+SECOND BLOCK:
+	this block defines the cube type. Byte size unknown. Write&Read sizeof(CubeType)
+
+	this block defines what cube textures are used for what round.
+	first the startTexture then the goalTexture. If CubeType == intermediate the intermediateTexture is last
+
+THIRD BLOCK:
+	this block defines how many discs are in each round and where they are located
+
+	1st byte: nr of discs this round
+
+	4 bytes for a float. 2 floats for position (x&y)
+	So read the next bytes as floats (per 4) to know the position of every disc
+	
+

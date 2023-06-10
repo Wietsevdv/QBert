@@ -33,9 +33,14 @@ namespace dae
 
 		CubeState GetCubeState() const { return m_CubeState; }
 		void SetCubeType(CubeType type) { m_CubeType = type; }
-		void SetNormalTexture(std::shared_ptr<Texture2D> pNormalTexture) { m_pNormalTexture = pNormalTexture; }
-		void SetIntermediateTexture(std::shared_ptr<Texture2D> pIntermediateTexture) { m_pIntermediateTexture = pIntermediateTexture; }
-		void SetGoalTexture(std::shared_ptr<Texture2D> pGoalTexture) { m_pGoalTexture = pGoalTexture; }
+
+		void SetFirstTexture(std::shared_ptr<Texture2D> pTexture) { m_pFirstTexture = pTexture; }
+		void SetSecondTexture(std::shared_ptr<Texture2D> pTexture) { m_pSecondTexture = pTexture; }
+		void SetThirdTexture(std::shared_ptr<Texture2D> pTexture) { m_pThirdTexture = pTexture; }
+
+		void SetStartTexture(int textureNr);
+		void SetIntermediateTexture(int textureNr);
+		void SetGoalTexture(int textureNr);
 
 		void Hit(GameObject* pGameObject);
 
@@ -51,7 +56,11 @@ namespace dae
 		CubeType m_CubeType;
 		CubeState m_CubeState;
 
-		std::shared_ptr<Texture2D> m_pNormalTexture;
+		std::shared_ptr<Texture2D> m_pFirstTexture;
+		std::shared_ptr<Texture2D> m_pSecondTexture;
+		std::shared_ptr<Texture2D> m_pThirdTexture;
+
+		std::shared_ptr<Texture2D> m_pStartTexture;
 		std::shared_ptr<Texture2D> m_pIntermediateTexture;
 		std::shared_ptr<Texture2D> m_pGoalTexture;
 

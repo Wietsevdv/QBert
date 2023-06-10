@@ -7,9 +7,9 @@ dae::CubeComponent::CubeComponent(GameObject* pGameObject)
 	: BaseComponent{ pGameObject }
 	, m_CubeType{ CubeType::Normal }
 	, m_CubeState{ CubeState::Normal }
-	, m_pNormalTexture{ nullptr }
-	, m_pIntermediateTexture{ nullptr }
-	, m_pGoalTexture{ nullptr }
+	, m_pFirstTexture{ nullptr }
+	, m_pSecondTexture{ nullptr }
+	, m_pThirdTexture{ nullptr }
 	, m_IsBottomEdgeCube{ false }
 	, m_IsRightEdgeCube{ false }
 	, m_IsLeftEdgeCube{ false }
@@ -18,6 +18,54 @@ dae::CubeComponent::CubeComponent(GameObject* pGameObject)
 		m_pTextureComponent = pGameObject->AddComponent<TextureComponent>(pGameObject);
 	else
 		m_pTextureComponent = pGameObject->GetComponent<TextureComponent>();
+}
+
+void dae::CubeComponent::SetStartTexture(int textureNr)
+{
+	switch (textureNr)
+	{
+		case 1:
+			m_pStartTexture = m_pFirstTexture;
+		break;
+		case 2:
+			m_pStartTexture = m_pSecondTexture;
+		break;
+		case 3:
+			m_pStartTexture = m_pThirdTexture;
+		break;
+	}
+}
+
+void dae::CubeComponent::SetIntermediateTexture(int textureNr)
+{
+	switch (textureNr)
+	{
+	case 1:
+		m_pIntermediateTexture = m_pFirstTexture;
+		break;
+	case 2:
+		m_pIntermediateTexture = m_pSecondTexture;
+		break;
+	case 3:
+		m_pIntermediateTexture = m_pThirdTexture;
+		break;
+	}
+}
+
+void dae::CubeComponent::SetGoalTexture(int textureNr)
+{
+	switch (textureNr)
+	{
+	case 1:
+		m_pGoalTexture = m_pFirstTexture;
+		break;
+	case 2:
+		m_pGoalTexture = m_pSecondTexture;
+		break;
+	case 3:
+		m_pGoalTexture = m_pThirdTexture;
+		break;
+	}
 }
 
 void dae::CubeComponent::Hit(GameObject* pGameObject)
@@ -62,7 +110,7 @@ void dae::CubeComponent::Hit(GameObject* pGameObject)
 			//switchback
 			if (pGameObject->IsComponentAdded<PlayerComponent>())
 			{
-				m_pTextureComponent->SetTexture(m_pNormalTexture);
+				m_pTextureComponent->SetTexture(m_pStartTexture);
 				m_CubeState = CubeState::Normal;
 
 				GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), GameEvents::PlayerDied);
