@@ -14,7 +14,7 @@ namespace dae
 		BinaryFileReader operator=(const BinaryFileReader& other) = delete;
 		BinaryFileReader operator=(BinaryFileReader&& other) = delete;
 
-		char* Read(std::streamsize count);
+		char* Read(char* dst, std::streamsize count);
 
 	private:
 		std::ifstream m_File;

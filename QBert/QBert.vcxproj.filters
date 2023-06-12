@@ -24,7 +24,7 @@
     <ClCompile Include="ProjectCommands.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProjectStatesAndTransitions.cpp">
+    <ClCompile Include="GameStateMachine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +35,7 @@
     <ClInclude Include="ProjectCommands.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ProjectStatesAndTransitions.h">
+    <ClInclude Include="GameStateMachine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

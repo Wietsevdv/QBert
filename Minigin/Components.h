@@ -267,7 +267,7 @@ namespace dae
 		virtual void SetTexture(const std::string& fileName);
 		void SetText(const std::string& text);
 
-		virtual void Notify(const GameObject& gameObject, GameEvents event) override;
+		virtual void Notify(const GameObject&, void*) override {};
 
 		const TextureComponent* GetTextureComponent() const { return m_pTextureComponent; }
 
@@ -292,7 +292,7 @@ namespace dae
 
 		virtual void SetTexture(const std::string& fileName) override;
 
-		virtual void Notify(const GameObject&, GameEvents) override {};
+		virtual void Notify(const GameObject&, void*) override {};
 
 		void Click(void* pData) const;
 

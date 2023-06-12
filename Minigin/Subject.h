@@ -19,7 +19,7 @@ namespace dae
 		void AddObserver(Observer* pObserver) { m_Observers.push_back(pObserver); } //add checks
 		void RemoveObserver(Observer*) {}; //make
 
-		void NotifyObservers(const GameObject& gameObject, GameEvents gameEvent);
+		void NotifyObservers(const GameObject& gameObject, void* pData);
 
 	private:
 		std::vector<Observer*> m_Observers;

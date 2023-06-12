@@ -181,15 +181,15 @@ xcopy $(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll $(OutputPath
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameStateMachine.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ProjectCommands.cpp" />
     <ClCompile Include="ProjectComponents.cpp" />
-    <ClCompile Include="ProjectStatesAndTransitions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameStateMachine.h" />
     <ClInclude Include="ProjectCommands.h" />
     <ClInclude Include="ProjectComponents.h" />
-    <ClInclude Include="ProjectStatesAndTransitions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

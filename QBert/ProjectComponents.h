@@ -145,7 +145,10 @@ namespace dae
 	class PlayerComponent final : public BaseComponent
 	{
 	public:
-		PlayerComponent(GameObject* pGameObject);
+		PlayerComponent(GameObject* pGameObject)
+			: BaseComponent{ pGameObject }
+		{
+		};
 
 		virtual ~PlayerComponent() {};
 		PlayerComponent(const PlayerComponent& other) = delete;
@@ -155,16 +158,6 @@ namespace dae
 
 		virtual void Update(const float) override {};
 		virtual void LateUpdate(const float) override {};
-
-		int GetNrOfLives() const { return m_NrOfLives; }
-		int GetScore() const { return m_Score; }
-
-		void LoseLifePoint();
-		void IncreaseScore(int amount);
-
-	private:
-		int m_NrOfLives;
-		int m_Score;
 	};
 
 	class PlayerCollisionComponent final : public CollisionComponent

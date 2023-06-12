@@ -315,7 +315,7 @@ void dae::UIComponent::SetTexture(const std::string& fileName)
 		m_pTextureComponent->SetTexture(fileName);
 	else if (!m_pTextComponent)
 	{
-		if (!GetOwner()->IsComponentAdded<TextComponent>())
+		if (!GetOwner()->IsComponentAdded<TextureComponent>())
 			m_pTextureComponent = GetOwner()->AddComponent<TextureComponent>(GetOwner());
 		else
 			m_pTextureComponent = GetOwner()->GetComponent<TextureComponent>();
@@ -339,18 +339,10 @@ void dae::UIComponent::SetText(const std::string& text)
 	}
 }
 
-void dae::UIComponent::Notify(const GameObject& gameObject, GameEvents event)
-{
-	gameObject;
-	event;
-
-	std::cout << "\nUI component notified\n";
-}
-
 dae::MenuButtonComponent::MenuButtonComponent(GameObject* pGameObject)
 	: UIComponent{ pGameObject }
 {
-	if (!GetOwner()->IsComponentAdded<TextComponent>())
+	if (!GetOwner()->IsComponentAdded<TransformComponent>())
 		m_pTransformComponent = GetOwner()->AddComponent<TransformComponent>(GetOwner());
 	else
 		m_pTransformComponent = GetOwner()->GetComponent<TransformComponent>();
@@ -388,6 +380,6 @@ void dae::MenuButtonComponent::Click(void* pData) const
 	if (*pX >= m_Points[0].x && *pX <= m_Points[1].x &&
 		*pY >= m_Points[2].y && *pY <= m_Points[0].y)
 	{
-		GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), PlayerDied);
+		GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), nullptr);
 	}
 }

@@ -10,13 +10,12 @@ dae::BinaryFileReader::~BinaryFileReader()
 	m_File.close();
 }
 
-char* dae::BinaryFileReader::Read(std::streamsize count)
+char* dae::BinaryFileReader::Read(char* dst, std::streamsize count)
 {
-	char* pData{ nullptr };
-	m_File.read(pData, count);
+	m_File.read(dst, count);
 
 	if (m_File)
-		return pData;
+		return dst;
 
 	return nullptr;
 }

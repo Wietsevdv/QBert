@@ -81,7 +81,7 @@ void dae::CubeComponent::Hit(GameObject* pGameObject)
 					m_pTextureComponent->SetTexture(m_pGoalTexture);
 					m_CubeState = CubeState::Completed;
 
-					GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), GameEvents::PlayerDied);
+					GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), nullptr);
 				}
 				else
 				{
@@ -99,7 +99,7 @@ void dae::CubeComponent::Hit(GameObject* pGameObject)
 				m_pTextureComponent->SetTexture(m_pGoalTexture);
 				m_CubeState = CubeState::Completed;
 
-				GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), GameEvents::PlayerDied);
+				GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), nullptr);
 			}
 		}
 		break;
@@ -113,7 +113,7 @@ void dae::CubeComponent::Hit(GameObject* pGameObject)
 				m_pTextureComponent->SetTexture(m_pStartTexture);
 				m_CubeState = CubeState::Normal;
 
-				GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), GameEvents::PlayerDied);
+				GetOwner()->GetSubject()->NotifyObservers(*GetOwner(), nullptr);
 			}
 		}
 		break;
@@ -249,32 +249,6 @@ void dae::MovementComponent::FallOff()
 
 	dae::SoundSystem* pSS = dae::ServiceLocator::GetSoundSystem();
 	pSS->Play(0);
-}
-
-dae::PlayerComponent::PlayerComponent(GameObject* pGameObject)
-	: BaseComponent(pGameObject)
-	, m_NrOfLives{ 3 }
-	, m_Score{ 0 }
-{
-}
-
-void dae::PlayerComponent::LoseLifePoint()
-{
-	if (m_NrOfLives > 0)
-	{
-		--m_NrOfLives;
-
-		GameObject* pOwner = GetOwner();
-		pOwner->GetSubject()->NotifyObservers(*pOwner, GameEvents::PlayerDied);
-	}
-}
-
-void dae::PlayerComponent::IncreaseScore(int amount)
-{
-	m_Score += amount;
-
-	GameObject* pOwner = GetOwner();
-	pOwner->GetSubject()->NotifyObservers(*pOwner, GameEvents::PlayerScoreIncreased);
 }
 
 dae::GravityComponent::GravityComponent(GameObject* pGameObject)

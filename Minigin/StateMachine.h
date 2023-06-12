@@ -22,7 +22,7 @@ namespace dae
 		BaseState operator=(BaseState&& other) = delete;
 
 		virtual void OnEnter() = 0;
-		virtual void Update(const float) = 0;
+		virtual void Update(float) = 0;
 		virtual void OnLeave() = 0;
 
 	private:
@@ -44,7 +44,7 @@ namespace dae
 		BaseTransition operator=(const BaseTransition& other) = delete;
 		BaseTransition operator=(BaseTransition&& other) = delete;
 
-		virtual bool Check(const float) = 0;
+		virtual bool Check(float) = 0;
 
 		BaseState* GetFrom() const { return m_pFrom; }
 		BaseState* GetTo() const { return m_pTo; }
@@ -64,10 +64,10 @@ namespace dae
 		StateMachine operator=(const StateMachine& other) = delete;
 		StateMachine operator=(StateMachine&& other) = delete;
 
-		void AddState(std::shared_ptr<BaseState> pNewState, bool setActive = true);
-		void AddTransition(std::shared_ptr<BaseTransition> pNewTransition) { m_Transitions[pNewTransition->GetFrom()].emplace_back(pNewTransition); }
+		virtual void AddState(std::shared_ptr<BaseState> pNewState, bool setActive = true);
+		virtual void AddTransition(std::shared_ptr<BaseTransition> pNewTransition) { m_Transitions[pNewTransition->GetFrom()].emplace_back(pNewTransition); }
 
-		void Update(const float deltaT);
+		virtual void Update(float deltaT);
 
 	private:
 		BaseState* m_pActiveState;

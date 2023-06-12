@@ -16,7 +16,7 @@ void dae::StateMachine::AddState(std::shared_ptr<BaseState> pNewState, bool setA
 	}
 }
 
-void dae::StateMachine::Update(const float deltaT)
+void dae::StateMachine::Update(float deltaT)
 {
 	if (m_pActiveState)
 		m_pActiveState->Update(deltaT);
